@@ -4,7 +4,6 @@ import { AuthenticatedUserType } from "@/@types/user.type";
 
 import {
   Drawer,
-  Typography,
   IconButton,
   List,
   ListItem,
@@ -24,9 +23,9 @@ const AppDrawerMenu = ({ open, setOpen, currentUser }: AppDrawerMenuProps) => {
   return (
     <Drawer open={open} onClose={closeDrawer} placement="right">
       <div className="mb-2 flex items-center justify-between p-4">
-        <Typography variant="h5" color="blue-gray" className="text-lg">
-          {currentUser ? currentUser.displayName : ""}
-        </Typography>
+        <h3 className="text-lg text-gray">
+          {currentUser ? currentUser.username : ""}
+        </h3>
         <IconButton variant="text" color="blue-gray" onClick={closeDrawer}>
           <svg
             xmlns="http://www.w3.org/2000/svg"

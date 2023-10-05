@@ -1,4 +1,3 @@
-import PrivateRoute from "@/routes/PrivateRoute";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -39,9 +38,7 @@ export default function RootLayout({
     <html lang="pt-br">
       <body className={inter.className}>
         <ModalManagerProvider>
-          <AuthProvider>
-            <PrivateRoute>{children}</PrivateRoute>
-          </AuthProvider>
+          <AuthProvider>{children}</AuthProvider>
         </ModalManagerProvider>
       </body>
     </html>

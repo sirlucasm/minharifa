@@ -31,10 +31,6 @@ export default function CreateAccount() {
     mode: "onBlur",
   });
 
-  const { ref: emailRef, ...emailProps } = register("email");
-  const { ref: usernameRef, ...usernameProps } = register("username");
-  const { ref: passwordRef, ...passwordProps } = register("password");
-
   const onSubmit: SubmitHandler<CreateUserDto> = useCallback(
     async (data) => {
       setIsLoading(true);
@@ -74,8 +70,7 @@ export default function CreateAccount() {
               containerProps={{ className: "mt-5" }}
               error={!!inputErrors.email?.message}
               maxLength={100}
-              forwardRef={emailRef}
-              {...emailProps}
+              {...register("email")}
             />
             {inputErrors.email?.message && (
               <span className="text-danger text-xs">
@@ -89,8 +84,7 @@ export default function CreateAccount() {
               type="text"
               error={!!inputErrors.username?.message}
               maxLength={100}
-              forwardRef={usernameRef}
-              {...usernameProps}
+              {...register("username")}
             />
             {inputErrors.username?.message && (
               <span className="text-danger text-xs">
@@ -104,8 +98,7 @@ export default function CreateAccount() {
               type="password"
               error={!!inputErrors.password?.message}
               maxLength={100}
-              forwardRef={passwordRef}
-              {...passwordProps}
+              {...register("password")}
             />
             {inputErrors.password?.message && (
               <span className="text-danger text-xs">

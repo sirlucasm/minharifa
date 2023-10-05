@@ -30,9 +30,6 @@ export default function SignIn() {
     mode: "onBlur",
   });
 
-  const { ref: emailRef, ...emailProps } = register("email");
-  const { ref: passwordRef, ...passwordProps } = register("password");
-
   const onSubmit: SubmitHandler<LoginUserDto> = useCallback(async (data) => {
     setIsLoading(true);
     console.log(data);
@@ -68,8 +65,7 @@ export default function SignIn() {
               containerProps={{ className: "mt-5" }}
               error={!!inputErrors.email?.message}
               maxLength={100}
-              forwardRef={emailRef}
-              {...emailProps}
+              {...register("email")}
             />
             {inputErrors.email?.message && (
               <span className="text-danger text-xs">
@@ -83,8 +79,7 @@ export default function SignIn() {
               type="password"
               error={!!inputErrors.password?.message}
               maxLength={100}
-              forwardRef={passwordRef}
-              {...passwordProps}
+              {...register("password")}
             />
             {inputErrors.password?.message && (
               <span className="text-danger text-xs">

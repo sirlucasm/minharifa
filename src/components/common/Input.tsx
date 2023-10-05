@@ -1,3 +1,6 @@
+/* eslint-disable react/display-name */
+import React from "react";
+
 import cx from "classix";
 
 import {
@@ -9,11 +12,11 @@ interface InputProps extends MInputProps {
   forwardRef?: React.Ref<HTMLInputElement>;
 }
 
-const Input = ({ forwardRef, ...props }: InputProps) => {
+const Input = React.forwardRef(({ ...props }: InputProps, ref) => {
   return (
     <MInput
       {...props}
-      ref={forwardRef}
+      ref={ref as any}
       crossOrigin=""
       className={cx(
         "focus:!border-b-primary focus:border-x-primary md:self-start",
@@ -26,6 +29,6 @@ const Input = ({ forwardRef, ...props }: InputProps) => {
       }}
     />
   );
-};
+});
 
 export default Input;

@@ -8,6 +8,8 @@ import { auth } from "@/configs/firebase";
 import authService from "@/services/auth";
 import { AuthContextType } from "@/@types/contexts/auth.type";
 import { AuthenticatedUserType } from "@/@types/user.type";
+import { useRouter } from "next/navigation";
+import routes from "@/routes";
 
 const AuthContext = createContext({
   currentUser: undefined,
@@ -16,6 +18,7 @@ const AuthContext = createContext({
 } as AuthContextType);
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const router = useRouter();
   const [currentUser, setCurrentUser] = useState<
     AuthenticatedUserType | undefined
   >();
@@ -29,14 +32,18 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         );
 
         setIsLoading(false);
-        if (!user) return;
+        if (!user) {
+          router.replace(routes.public.login);
+          return;
+        }
         setCurrentUser(Object.assign(user, fetchedCurrentUser));
         return;
       }
+      router.replace(routes.public.login);
       setCurrentUser(undefined);
       setIsLoading(false);
     });
-  }, []);
+  }, [router]);
 
   return (
     <AuthContext.Provider

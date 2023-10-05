@@ -9,6 +9,7 @@ import LogoImage from "@/assets/images/logo.svg?url";
 
 import { Wrapper } from "@/components/common/Wrapper";
 import Profile from "./Profile";
+import routes from "@/routes";
 
 type HeaderProps = {
   variants?: "ghost" | "light" | "dark" | "primary" | "secondary";
@@ -28,16 +29,15 @@ const AppHeader = ({ variants }: HeaderProps) => {
       )}
     >
       <Wrapper className={cx("flex items-center justify-between py-3.5")}>
-        <Link href="/" className="flex items-center">
+        <Link href={routes.public.login} className="flex items-center">
           <Image
             priority
             src={LogoImage}
             alt="Logo primary"
-            width={40}
+            width={160}
             className=""
           />
         </Link>
-
         <div className="flex items-center gap-6">
           <Profile currentUser={currentUser} />
         </div>
