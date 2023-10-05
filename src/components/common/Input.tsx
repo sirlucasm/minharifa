@@ -15,8 +15,8 @@ interface InputProps extends MInputProps {
 const Input = React.forwardRef(({ ...props }: InputProps, ref) => {
   return (
     <MInput
-      {...props}
       ref={ref as any}
+      {...props}
       crossOrigin=""
       className={cx(
         "focus:!border-b-primary focus:border-x-primary md:self-start",

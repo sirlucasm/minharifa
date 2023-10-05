@@ -65,12 +65,12 @@ export default function CreateAccount() {
           />
           <div className="lg:w-full">
             <Input
+              {...register("email")}
               label="E-mail"
               type="email"
               containerProps={{ className: "mt-5" }}
               error={!!inputErrors.email?.message}
               maxLength={100}
-              {...register("email")}
             />
             {inputErrors.email?.message && (
               <span className="text-danger text-xs">
@@ -80,11 +80,11 @@ export default function CreateAccount() {
           </div>
           <div className="lg:w-full">
             <Input
+              {...register("username")}
               label="Nome de usuário"
               type="text"
               error={!!inputErrors.username?.message}
               maxLength={100}
-              {...register("username")}
             />
             {inputErrors.username?.message && (
               <span className="text-danger text-xs">
@@ -94,11 +94,11 @@ export default function CreateAccount() {
           </div>
           <div className="lg:w-full">
             <Input
+              {...register("password")}
               label="Senha"
               type="password"
               error={!!inputErrors.password?.message}
               maxLength={100}
-              {...register("password")}
             />
             {inputErrors.password?.message && (
               <span className="text-danger text-xs">
