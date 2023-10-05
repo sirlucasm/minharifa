@@ -11,39 +11,45 @@ import LogoImage from "@/assets/images/logo.svg?url";
 
 import authService from "@/services/auth";
 import useYupValidationResolver from "@/hooks/useYupValidationResolver";
-import { loginUserSchema } from "@/schemas/auth";
+import { createUserSchema } from "@/schemas/auth";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { message } from "antd";
-import { LoginUserDto } from "@/@types/user.type";
+import { CreateUserDto } from "@/@types/user.type";
 import LinkButton from "@/components/common/LinkButton";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import routes from "@/routes";
 
-export default function SignIn() {
+export default function CreateAccount() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const {
     handleSubmit,
     register,
     formState: { errors: inputErrors },
-  } = useForm<LoginUserDto>({
-    resolver: useYupValidationResolver(loginUserSchema),
+  } = useForm<CreateUserDto>({
+    resolver: useYupValidationResolver(createUserSchema),
     mode: "onBlur",
   });
 
   const { ref: emailRef, ...emailProps } = register("email");
+  const { ref: usernameRef, ...usernameProps } = register("username");
   const { ref: passwordRef, ...passwordProps } = register("password");
 
-  const onSubmit: SubmitHandler<LoginUserDto> = useCallback(async (data) => {
-    setIsLoading(true);
-    console.log(data);
-    try {
-      await authService.signInUser(data);
-    } catch (error: any) {
-      message.error(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const onSubmit: SubmitHandler<CreateUserDto> = useCallback(
+    async (data) => {
+      setIsLoading(true);
+      try {
+        await authService.createUser(data);
+        message.success("Sua conta criada com sucesso.");
+        router.push(routes.public.login);
+      } catch (error: any) {
+        message.error(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [router]
+  );
 
   return (
     <div className="flex flex-col lg:flex-row w-full h-screen bg-primary">
@@ -79,6 +85,21 @@ export default function SignIn() {
           </div>
           <div className="lg:w-full">
             <Input
+              label="Nome de usuário"
+              type="text"
+              error={!!inputErrors.username?.message}
+              maxLength={100}
+              forwardRef={usernameRef}
+              {...usernameProps}
+            />
+            {inputErrors.username?.message && (
+              <span className="text-danger text-xs">
+                {inputErrors.username.message}
+              </span>
+            )}
+          </div>
+          <div className="lg:w-full">
+            <Input
               label="Senha"
               type="password"
               error={!!inputErrors.password?.message}
@@ -92,18 +113,12 @@ export default function SignIn() {
               </span>
             )}
           </div>
-          <Link
-            href="/esqueceu-senha"
-            className="text-gray-dark text-sm hover:text-gray lg:self-start"
-          >
-            Esqueci minha senha
-          </Link>
           <div className="flex flex-col items-center justify-center gap-3 w-full mt-4 sm:flex-row">
             <Button type="submit" isLoading={isLoading}>
-              Entrar
+              Cadastrar
             </Button>
-            <LinkButton href={routes.public.register} colorVariant="outlined">
-              Cadastre-se grátis
+            <LinkButton href={routes.public.login} colorVariant="outlined">
+              Já tenho uma conta
             </LinkButton>
           </div>
         </form>
