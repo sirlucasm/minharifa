@@ -7,6 +7,7 @@ const routes = {
   },
   private: {
     home: "/inicio",
+    raffle: "/rifas/criar",
   },
 };
 

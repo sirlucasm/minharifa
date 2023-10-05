@@ -29,7 +29,10 @@ const AppHeader = ({ variants }: HeaderProps) => {
       )}
     >
       <Wrapper className={cx("flex items-center justify-between py-3.5")}>
-        <Link href={routes.public.login} className="flex items-center">
+        <Link
+          href={currentUser ? routes.private.home : routes.public.login}
+          className="flex items-center"
+        >
           <Image
             priority
             src={LogoImage}

@@ -22,7 +22,7 @@ const config = withMT({
         secondary: "#242628",
         white: "#ffffff",
         "gray-light": "#CACCCE",
-        gray: "#86888A",
+        gray: "#7d7e80",
         "gray-dark": "#3d3d3d",
         danger: "#E74C3C",
         success: "#2ECC71",
