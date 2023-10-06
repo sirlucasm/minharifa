@@ -7,7 +7,9 @@ const routes = {
   },
   private: {
     home: "/inicio",
-    raffle: "/rifas/criar",
+
+    createRaffle: "/rifas/criar",
+    showRaffle: (slug: string) => `/rifas/${slug}`,
   },
 };
 

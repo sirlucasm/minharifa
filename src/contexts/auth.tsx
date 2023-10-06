@@ -7,7 +7,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/configs/firebase";
 import authService from "@/services/auth";
 import { AuthContextType } from "@/@types/contexts/auth.type";
-import { AuthenticatedUserType } from "@/@types/user.type";
+import { IAuthenticatedUser } from "@/@types/user.type";
 import { useRouter } from "next/navigation";
 import routes from "@/routes";
 
@@ -20,7 +20,7 @@ const AuthContext = createContext({
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<
-    AuthenticatedUserType | undefined
+    IAuthenticatedUser | undefined
   >();
   const [isLoading, setIsLoading] = useState(true);
 

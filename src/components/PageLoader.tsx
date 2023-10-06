@@ -1,6 +1,6 @@
 export const PageLoader = () => {
   return (
-    <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white overflow-y-hidden z-99">
+    <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white overflow-y-hidden z-[99]">
       <h3 className="text-primary text-3xl font-semibold select-none mb-2.5">
         minharifa
       </h3>

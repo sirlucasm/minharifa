@@ -8,11 +8,11 @@ import {
   SelectProps as MSelectProps,
 } from "@material-tailwind/react";
 
-interface InputProps extends MSelectProps {
+interface SelectProps extends MSelectProps {
   forwardRef?: React.Ref<HTMLInputElement>;
 }
 
-const Select = React.forwardRef(({ ...props }: InputProps, ref) => {
+const Select = React.forwardRef(({ ...props }: SelectProps, ref) => {
   return (
     <MSelect
       ref={ref as any}

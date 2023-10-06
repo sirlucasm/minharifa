@@ -21,6 +21,7 @@ const AppHeader = ({ variants }: HeaderProps) => {
   return (
     <header
       className={cx(
+        "z-[90]",
         variants === "ghost" && "bg-transparent",
         variants === "light" && "bg-white shadow-lg",
         variants === "primary" && "bg-primary shadow-lg",

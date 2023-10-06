@@ -24,8 +24,10 @@ const Input = React.forwardRef(({ ...props }: InputProps, ref) => {
       )}
       labelProps={{
         ...props.labelProps,
-        className:
+        className: cx(
           "peer-focus:before:!border-primary peer-focus:after:!border-primary peer-focus:!text-primary peer-focus:!border-primary",
+          props.labelProps?.className
+        ),
       }}
     />
   );

@@ -24,7 +24,7 @@ export default function SignIn() {
   const {
     handleSubmit,
     register,
-    formState: { errors: inputErrors },
+    formState: { errors },
   } = useForm<LoginUserDto>({
     resolver: useYupValidationResolver(loginUserSchema),
     mode: "onBlur",
@@ -64,12 +64,12 @@ export default function SignIn() {
               label="E-mail"
               type="email"
               containerProps={{ className: "mt-5" }}
-              error={!!inputErrors.email?.message}
+              error={!!errors.email?.message}
               maxLength={100}
             />
-            {inputErrors.email?.message && (
+            {errors.email?.message && (
               <span className="text-danger text-xs">
-                {inputErrors.email.message}
+                {errors.email.message}
               </span>
             )}
           </div>
@@ -78,12 +78,12 @@ export default function SignIn() {
               {...register("password")}
               label="Senha"
               type="password"
-              error={!!inputErrors.password?.message}
+              error={!!errors.password?.message}
               maxLength={100}
             />
-            {inputErrors.password?.message && (
+            {errors.password?.message && (
               <span className="text-danger text-xs">
-                {inputErrors.password.message}
+                {errors.password.message}
               </span>
             )}
           </div>

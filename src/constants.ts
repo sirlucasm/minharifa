@@ -15,6 +15,11 @@ export const ERRORS = {
     code: "auth/accountSignInFailed",
     message: "Falha ao tentar entrar na sua conta. Contate o suporte",
   },
+
+  raffleShortNameExists: {
+    code: "raffle/shortNameExists",
+    message: "O nome curto informado já está em uso",
+  },
 };
 
 export const FIREBASE_ERRORS = {

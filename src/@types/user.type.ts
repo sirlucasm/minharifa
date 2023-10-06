@@ -3,7 +3,7 @@
 import { User } from "firebase/auth";
 import { Timestamp } from "firebase/firestore";
 
-export type UserType = {
+export type IUser = {
   id: string;
   fullName: string;
   email: string;
@@ -17,7 +17,7 @@ export type UserType = {
   lastLoginAt: Timestamp;
 };
 
-export type AuthenticatedUserType = User & UserType;
+export type IAuthenticatedUser = User & IUser;
 
 export interface LoginUserDto {
   email: string;

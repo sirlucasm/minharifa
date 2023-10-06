@@ -2,14 +2,14 @@ import Image from "next/image";
 
 import MenuIcon from "@/assets/icons/profile.svg?url";
 import useDrawerManager from "@/hooks/useDrawerManager";
-import { AuthenticatedUserType } from "@/@types/user.type";
+import { IAuthenticatedUser } from "@/@types/user.type";
 
 import Button from "./common/Button";
 import AppDrawerMenu from "./AppDrawerMenu";
 import { useCallback } from "react";
 
 interface ProfileProps {
-  currentUser: AuthenticatedUserType | undefined;
+  currentUser: IAuthenticatedUser | undefined;
 }
 
 const Profile = ({ currentUser }: ProfileProps) => {

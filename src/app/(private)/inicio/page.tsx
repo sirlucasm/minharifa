@@ -12,11 +12,11 @@ export default function Home() {
       <div>
         <div className="flex flex-col md:flex-row">
           <Link
-            href={routes.private.raffle}
+            href={routes.private.createRaffle}
             className="mt-4 bg-white shadow-md p-4 w-36 flex flex-col items-center rounded-xl hover:shadow-lg transition-shadow duration-300"
           >
             <Image src={TicketIcon} alt="Ticket icon" className="w-8" />
-            <span className="text-sm text-gray">Criar Rifa</span>
+            <span className="text-sm text-gray font-semibold">Criar Rifa</span>
           </Link>
         </div>
       </div>

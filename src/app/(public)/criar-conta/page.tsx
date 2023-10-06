@@ -25,7 +25,7 @@ export default function CreateAccount() {
   const {
     handleSubmit,
     register,
-    formState: { errors: inputErrors },
+    formState: { errors },
   } = useForm<CreateUserDto>({
     resolver: useYupValidationResolver(createUserSchema),
     mode: "onBlur",
@@ -69,12 +69,12 @@ export default function CreateAccount() {
               label="E-mail"
               type="email"
               containerProps={{ className: "mt-5" }}
-              error={!!inputErrors.email?.message}
+              error={!!errors.email?.message}
               maxLength={100}
             />
-            {inputErrors.email?.message && (
+            {errors.email?.message && (
               <span className="text-danger text-xs">
-                {inputErrors.email.message}
+                {errors.email.message}
               </span>
             )}
           </div>
@@ -83,12 +83,12 @@ export default function CreateAccount() {
               {...register("username")}
               label="Nome de usuário"
               type="text"
-              error={!!inputErrors.username?.message}
+              error={!!errors.username?.message}
               maxLength={100}
             />
-            {inputErrors.username?.message && (
+            {errors.username?.message && (
               <span className="text-danger text-xs">
-                {inputErrors.username.message}
+                {errors.username.message}
               </span>
             )}
           </div>
@@ -97,12 +97,12 @@ export default function CreateAccount() {
               {...register("password")}
               label="Senha"
               type="password"
-              error={!!inputErrors.password?.message}
+              error={!!errors.password?.message}
               maxLength={100}
             />
-            {inputErrors.password?.message && (
+            {errors.password?.message && (
               <span className="text-danger text-xs">
-                {inputErrors.password.message}
+                {errors.password.message}
               </span>
             )}
           </div>

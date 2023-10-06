@@ -17,7 +17,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { removeStorage, setStorage } from "@/utils/storage";
-import { CreateUserDto, LoginUserDto, UserType } from "@/@types/user.type";
+import { CreateUserDto, LoginUserDto, IUser } from "@/@types/user.type";
 import moment from "moment";
 import { ERRORS, FIREBASE_ERRORS } from "@/constants";
 
@@ -64,7 +64,7 @@ class AuthService {
     const user = users[0];
 
     return {
-      user: user as UserType,
+      user: user as IUser,
       userDoc: doc(db, "users", userDocIds[0]),
       userCount: users.length,
     };

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { AuthenticatedUserType } from "@/@types/user.type";
+import { IAuthenticatedUser } from "@/@types/user.type";
 
 import {
   Drawer,
@@ -14,7 +14,7 @@ import authService from "@/services/auth";
 interface AppDrawerMenuProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  currentUser: AuthenticatedUserType | undefined;
+  currentUser: IAuthenticatedUser | undefined;
 }
 
 const AppDrawerMenu = ({ open, setOpen, currentUser }: AppDrawerMenuProps) => {

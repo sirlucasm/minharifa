@@ -1,7 +1,7 @@
-import { AuthenticatedUserType } from "../user.type";
+import { IAuthenticatedUser } from "../user.type";
 
 export type AuthContextType = {
-  currentUser: AuthenticatedUserType | undefined;
+  currentUser: IAuthenticatedUser | undefined;
   isLoggedIn: boolean;
   isLoading: boolean;
 };
