@@ -24,7 +24,7 @@ export interface CreateRaffleDto {
   name: string;
   type: IRaffleType;
   visibility: IRaffleVisibility;
-  quantity?: number;
+  quantity?: string;
   value: number;
   shortName: string;
 }

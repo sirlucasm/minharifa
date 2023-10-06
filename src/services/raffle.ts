@@ -25,6 +25,7 @@ class RaffleService {
 
     await setDoc(raffleDoc, {
       ...data,
+      quantity: parseInt(data.quantity as string),
       id: raffleDoc.id,
       createdAt: new Date(),
       userId,
