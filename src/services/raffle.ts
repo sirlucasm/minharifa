@@ -15,7 +15,11 @@ const rafflesRef = collection(db, "raffles");
 
 class RaffleService {
   createRaffle = async (userId: string, data: CreateRaffleDto) => {
-    const q = query(rafflesRef, where("shortName", "==", data.shortName));
+    const q = query(
+      rafflesRef,
+      where("shortName", "==", data.shortName),
+      where("isDeleted", "==", false)
+    );
 
     const querySnapshot = await getDocs(q);
 
@@ -29,11 +33,16 @@ class RaffleService {
       id: raffleDoc.id,
       createdAt: new Date(),
       userId,
+      isDeleted: false,
     });
   };
 
   listRaffle = async (userId: string) => {
-    const q = query(rafflesRef, where("userId", "==", userId));
+    const q = query(
+      rafflesRef,
+      where("userId", "==", userId),
+      where("isDeleted", "==", false)
+    );
 
     const querySnapshot = await getDocs(q);
 
@@ -49,7 +58,8 @@ class RaffleService {
     const q = query(
       rafflesRef,
       where("userId", "==", userId),
-      where("shortName", "==", shortName)
+      where("shortName", "==", shortName),
+      where("isDeleted", "==", false)
     );
 
     const querySnapshot = await getDocs(q);

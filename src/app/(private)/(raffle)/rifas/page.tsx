@@ -55,7 +55,7 @@ export default function Raffle() {
               <Link
                 key={raffle.id}
                 href={routes.private.showRaffle(raffle.shortName)}
-                className="bg-white border-2 border-gray shadow-md py-3 px-6 w-full md:min-w-52 md:w-fit rounded-xl hover:border-primary"
+                className="bg-white border-2 border-gray shadow-md py-3 px-6 w-full md:min-w-52 md:w-fit hover:border-primary"
               >
                 <div className="self-start">
                   <h3 className="font-semibold text-gray-dark">

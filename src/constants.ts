@@ -20,6 +20,10 @@ export const ERRORS = {
     code: "raffle/shortNameExists",
     message: "O nome curto informado já está em uso",
   },
+  raffleNotFound: {
+    code: "raffle/notFound",
+    message: "A Rifa não foi encontrada",
+  },
 };
 
 export const FIREBASE_ERRORS = {
