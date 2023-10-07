@@ -8,6 +8,7 @@ const routes = {
   private: {
     home: "/inicio",
 
+    listRaffle: "/rifas",
     createRaffle: "/rifas/criar",
     showRaffle: (slug: string) => `/rifas/${slug}`,
   },

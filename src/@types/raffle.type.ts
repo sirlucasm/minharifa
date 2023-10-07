@@ -11,7 +11,7 @@ export interface IRaffle {
   type: IRaffleType;
   visibility: IRaffleVisibility;
   quantity?: number;
-  value: number;
+  value: string;
   shortName: string;
   userId: string;
   updatedAt: Timestamp;
@@ -25,6 +25,6 @@ export interface CreateRaffleDto {
   type: IRaffleType;
   visibility: IRaffleVisibility;
   quantity?: string;
-  value: number;
+  value: string;
   shortName: string;
 }
