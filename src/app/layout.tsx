@@ -6,7 +6,8 @@ import { ModalManagerProvider } from "@/contexts/modalManager";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const logoImage = "";
+const logoImage =
+  "https://www.minharifa.click/_next/static/media/logo.6edfd740.svg";
 
 export const metadata: Metadata = {
   title: "Minha Rifa - Gerencie sua rifa online",
