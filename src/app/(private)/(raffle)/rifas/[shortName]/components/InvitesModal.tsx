@@ -32,13 +32,13 @@ export default function InvitesModal({
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchRaffleInvites = useCallback(async () => {
-    if (!raffleId) return;
+    if (!raffleId || !open) return;
     setIsLoading(true);
     const response = await raffleService.getInviteRequestsAndUser(raffleId);
 
     setInvites(response);
     setIsLoading(false);
-  }, [raffleId]);
+  }, [raffleId, open]);
 
   const handleAcceptInviteRequest = useCallback(
     async (invite: IRaffleInvite) => {

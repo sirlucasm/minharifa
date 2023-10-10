@@ -56,8 +56,13 @@ class RaffleService {
   listRaffle = async (userId: string) => {
     const q = query(
       rafflesRef,
-      where("userId", "==", userId),
-      where("isDeleted", "==", false)
+      and(
+        or(
+          where("sharedUsers", "array-contains", userId),
+          where("userId", "==", userId)
+        ),
+        where("isDeleted", "==", false)
+      )
     );
 
     const querySnapshot = await getDocs(q);
