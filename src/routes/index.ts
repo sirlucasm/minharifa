@@ -8,9 +8,13 @@ const routes = {
   private: {
     home: "/inicio",
 
-    listRaffle: "/rifas",
-    createRaffle: "/rifas/criar",
-    showRaffle: (slug: string) => `/rifas/${slug}`,
+    raffle: {
+      list: "/rifas",
+      create: "/rifas/criar",
+      show: (slug: string) => `/rifas/${slug}`,
+      requestInvite: (slug: string) => `/rifas/${slug}/solicitar-convite`,
+      acceptInvite: (slug: string) => `/rifas/${slug}/aceitar-convite`,
+    },
   },
 };
 

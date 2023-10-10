@@ -37,7 +37,7 @@ export default function Raffle() {
     <Wrapper>
       <div className="mt-3 flex gap-3 overflow-x-auto p-2">
         <Link
-          href={routes.private.createRaffle}
+          href={routes.private.raffle.create}
           className="mt-4 bg-white shadow-md p-2 w-32 flex flex-col items-center rounded-xl hover:shadow-lg transition-shadow duration-300"
         >
           <Image src={PlusIcon} alt="Plus icon" className="w-8" />
@@ -54,7 +54,7 @@ export default function Raffle() {
             raffles.map((raffle) => (
               <Link
                 key={raffle.id}
-                href={routes.private.showRaffle(raffle.shortName)}
+                href={routes.private.raffle.show(raffle.shortName)}
                 className="bg-white border-2 border-gray shadow-md py-3 px-6 w-full md:min-w-52 md:w-fit hover:border-primary"
               >
                 <div className="self-start">

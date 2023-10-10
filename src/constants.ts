@@ -28,6 +28,10 @@ export const ERRORS = {
     code: "raffle/numberAlreadyUsed",
     message: "Número da rifa já está sendo utilizado",
   },
+  raffleInviteAlreadySent: {
+    code: "raffle/inviteAlreadySent",
+    message: "Pedido de participação da Rifa já foi enviado",
+  },
 };
 
 export const FIREBASE_ERRORS = {

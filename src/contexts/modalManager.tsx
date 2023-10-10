@@ -1,47 +1,20 @@
 "use client";
 import { ModalManagerContextType } from "@/@types/contexts/modalManager.type";
-import { createContext, useCallback, useState } from "react";
+import { createContext, useState } from "react";
 
 const ModalManagerContext = createContext({
-  isOpenSelectLoginTypeModal: false,
-  isOpenLocationPermissionAdviseModal: false,
-  setIsOpenLocationPermissionAdviseModal: () => {},
-  handleOpenSelectLoginTypeModal: () => {},
-  handleCloseSelectLoginTypeModal: () => {},
-  selectedLoginButton: "login",
+  isOpenInvitesModal: false,
+  setIsOpenInvitesModal: () => {},
 } as ModalManagerContextType);
 
 const ModalManagerProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isOpenSelectLoginTypeModal, setIsOpenSelectLoginTypeModal] =
-    useState(false);
-  const [
-    isOpenLocationPermissionAdviseModal,
-    setIsOpenLocationPermissionAdviseModal,
-  ] = useState(false);
-  const [selectedLoginButton, setSelectedLoginButton] =
-    useState<ModalManagerContextType["selectedLoginButton"]>("login");
-
-  const handleOpenSelectLoginTypeModal = useCallback(
-    (loginType: ModalManagerContextType["selectedLoginButton"]) => {
-      setSelectedLoginButton(loginType);
-      setIsOpenSelectLoginTypeModal(true);
-    },
-    []
-  );
-  const handleCloseSelectLoginTypeModal = useCallback(
-    () => setIsOpenSelectLoginTypeModal(false),
-    []
-  );
+  const [isOpenInvitesModal, setIsOpenInvitesModal] = useState(false);
 
   return (
     <ModalManagerContext.Provider
       value={{
-        isOpenSelectLoginTypeModal,
-        isOpenLocationPermissionAdviseModal,
-        setIsOpenLocationPermissionAdviseModal,
-        handleOpenSelectLoginTypeModal,
-        handleCloseSelectLoginTypeModal,
-        selectedLoginButton,
+        isOpenInvitesModal,
+        setIsOpenInvitesModal,
       }}
     >
       {children}

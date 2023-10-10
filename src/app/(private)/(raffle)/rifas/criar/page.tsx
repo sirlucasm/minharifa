@@ -43,9 +43,12 @@ export default function CreateRaffle() {
       setIsLoading(true);
       try {
         if (!currentUser) return;
-        await raffleService.createRaffle(currentUser.id, data);
+        await raffleService.createRaffle({
+          ...data,
+          userId: currentUser.id,
+        });
         message.success("Rifa criada com sucesso!");
-        router.push(routes.private.showRaffle(data.shortName));
+        router.push(routes.private.raffle.show(data.shortName));
       } catch (error: any) {
         message.error(error.message);
       } finally {
