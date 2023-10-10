@@ -1,17 +1,24 @@
-import { CreateRaffleDto, IRaffle } from "@/@types/raffle.type";
+import {
+  CreateRaffleDto,
+  CreateRaffleUserDto,
+  IRaffle,
+} from "@/@types/raffle.type";
 import { db } from "@/configs/firebase";
 import { ERRORS } from "@/constants";
 import {
   DocumentData,
+  and,
   collection,
   doc,
   getDocs,
+  or,
   query,
   setDoc,
   where,
 } from "firebase/firestore";
 
 const rafflesRef = collection(db, "raffles");
+const raffleUsersRef = collection(db, "raffleUsers");
 
 class RaffleService {
   createRaffle = async (userId: string, data: CreateRaffleDto) => {
@@ -57,9 +64,14 @@ class RaffleService {
   getRaffle = async (shortName: string, userId: string) => {
     const q = query(
       rafflesRef,
-      where("userId", "==", userId),
-      where("shortName", "==", shortName),
-      where("isDeleted", "==", false)
+      and(
+        or(
+          where("sharedUsers", "array-contains", userId),
+          where("userId", "==", userId)
+        ),
+        where("shortName", "==", shortName),
+        where("isDeleted", "==", false)
+      )
     );
 
     const querySnapshot = await getDocs(q);
@@ -67,6 +79,32 @@ class RaffleService {
     const raffle = querySnapshot.docs[0].data();
 
     return raffle as IRaffle;
+  };
+
+  createRaffleUser = async (data: CreateRaffleUserDto) => {
+    const numbersFormatted = data.numbers.map((number) => number.userNumber);
+
+    const q = query(
+      raffleUsersRef,
+      where("numbers", "array-contains-any", numbersFormatted),
+      where("isDeleted", "==", false)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) throw ERRORS.raffleUserNumberAlreadyUsed;
+
+    const raffleUserDoc = doc(raffleUsersRef);
+
+    await setDoc(raffleUserDoc, {
+      ...data,
+      numbers: numbersFormatted,
+      id: raffleUserDoc.id,
+      createdAt: new Date(),
+      userId: data.userId,
+      raffleId: data.raffleId,
+      isDeleted: false,
+    });
   };
 }
 

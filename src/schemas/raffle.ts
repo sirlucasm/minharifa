@@ -21,3 +21,19 @@ export const createRaffleSchema = yup.object({
   }),
   value: yup.string().required("Você deve informar um nome"),
 });
+
+export const createRaffleUserSchema = yup.object({
+  name: yup.string().required("Você deve informar um nome"),
+  numbers: yup
+    .array()
+    .of(
+      yup
+        .object()
+        .shape({
+          userNumber: yup.number().required("Você deve informar um número"),
+        })
+        .noUnknown()
+    )
+    .min(1, "Você deve informar pelo menos um número")
+    .required("Você deve informar um número"),
+});

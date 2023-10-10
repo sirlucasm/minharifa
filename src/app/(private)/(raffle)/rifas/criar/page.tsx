@@ -33,7 +33,7 @@ export default function CreateRaffle() {
     formState: { errors },
   } = useForm<CreateRaffleDto>({
     resolver: useYupValidationResolver(createRaffleSchema),
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const values = watch();

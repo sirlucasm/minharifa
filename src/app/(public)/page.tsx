@@ -27,7 +27,7 @@ export default function SignIn() {
     formState: { errors },
   } = useForm<LoginUserDto>({
     resolver: useYupValidationResolver(loginUserSchema),
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const onSubmit: SubmitHandler<LoginUserDto> = useCallback(async (data) => {

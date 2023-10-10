@@ -28,7 +28,7 @@ export default function CreateAccount() {
     formState: { errors },
   } = useForm<CreateUserDto>({
     resolver: useYupValidationResolver(createUserSchema),
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const onSubmit: SubmitHandler<CreateUserDto> = useCallback(

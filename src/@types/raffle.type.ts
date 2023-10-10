@@ -28,3 +28,23 @@ export interface CreateRaffleDto {
   value: string;
   shortName: string;
 }
+
+export interface IRaffleUser {
+  id: string;
+  name: string;
+  numbers: number[];
+  userId: string;
+  raffleId: string;
+  createdAt: Timestamp;
+  deletedAt: Timestamp;
+  isDeleted: boolean;
+}
+
+export interface CreateRaffleUserDto {
+  name: string;
+  numbers: {
+    userNumber: number;
+  }[];
+  userId: string;
+  raffleId: string;
+}

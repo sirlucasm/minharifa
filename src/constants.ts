@@ -24,6 +24,10 @@ export const ERRORS = {
     code: "raffle/notFound",
     message: "A Rifa não foi encontrada",
   },
+  raffleUserNumberAlreadyUsed: {
+    code: "raffle/numberAlreadyUsed",
+    message: "Número da rifa já está sendo utilizado",
+  },
 };
 
 export const FIREBASE_ERRORS = {
