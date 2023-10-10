@@ -97,6 +97,22 @@ class RaffleService {
     return raffle as IRaffle;
   };
 
+  getRaffleByShortName = async (shortName: string) => {
+    const q = query(
+      rafflesRef,
+      where("shortName", "==", shortName),
+      where("isDeleted", "==", false)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) throw ERRORS.raffleNotFound;
+
+    const raffle = querySnapshot.docs[0].data();
+
+    return raffle as IRaffle;
+  };
+
   getOwnerUserAndRaffleByRaffleShortName = async (shortName: string) => {
     const q = query(
       rafflesRef,
