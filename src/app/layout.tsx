@@ -6,9 +6,6 @@ import { ModalManagerProvider } from "@/contexts/modalManager";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const logoImage =
-  "https://www.minharifa.click/_next/static/media/logo.6edfd740.svg";
-
 export const metadata: Metadata = {
   title: "Minha Rifa - Gerencie sua rifa online",
   description: "Seu gerenciador de rifas online.",
@@ -22,11 +19,9 @@ export const metadata: Metadata = {
     siteName: "Minha Rifa - Gerencie sua rifa online",
     locale: "pt_BR",
     url: process.env.NEXT_PUBLIC_APP_URL,
-    images: logoImage,
   },
   appleWebApp: {
     title: "Minha Rifa - Gerencie sua rifa online",
-    startupImage: logoImage,
   },
 };
 

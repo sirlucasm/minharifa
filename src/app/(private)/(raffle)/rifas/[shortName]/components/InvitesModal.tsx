@@ -100,35 +100,43 @@ export default function InvitesModal({
             <Spinner />
           ) : (
             <div className="flex flex-col gap-2 mt-2">
-              {invites.map((invite) => (
-                <div key={invite.id} className="flex items-center gap-3">
-                  <Image
-                    priority
-                    src={invite.user.profileImageUrl || MenuIcon}
-                    alt="Profile image"
-                    className="w-6 rounded-full"
-                  />
-                  <span className="text-md text-gray font-semibold">
-                    {invite.user.username}
+              {!invites.length ? (
+                <div>
+                  <span className="text-xs text-gray italic">
+                    Nenhum pedido para participar
                   </span>
-                  <div className="flex items-center gap-1">
-                    <IconButton
-                      className="rounded-full bg-danger"
-                      size="sm"
-                      onClick={() => handleCancelInviteRequest(invite)}
-                    >
-                      <Image src={CloseWhiteIcon} alt="Close white icon" />
-                    </IconButton>
-                    <IconButton
-                      className="rounded-full bg-success"
-                      size="sm"
-                      onClick={() => handleAcceptInviteRequest(invite)}
-                    >
-                      <Image src={CheckWhiteIcon} alt="Check white icon" />
-                    </IconButton>
-                  </div>
                 </div>
-              ))}
+              ) : (
+                invites.map((invite) => (
+                  <div key={invite.id} className="flex items-center gap-3">
+                    <Image
+                      priority
+                      src={invite.user.profileImageUrl || MenuIcon}
+                      alt="Profile image"
+                      className="w-6 rounded-full"
+                    />
+                    <span className="text-md text-gray font-semibold">
+                      {invite.user.username}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <IconButton
+                        className="rounded-full bg-danger"
+                        size="sm"
+                        onClick={() => handleCancelInviteRequest(invite)}
+                      >
+                        <Image src={CloseWhiteIcon} alt="Close white icon" />
+                      </IconButton>
+                      <IconButton
+                        className="rounded-full bg-success"
+                        size="sm"
+                        onClick={() => handleAcceptInviteRequest(invite)}
+                      >
+                        <Image src={CheckWhiteIcon} alt="Check white icon" />
+                      </IconButton>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>

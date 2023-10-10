@@ -9,9 +9,6 @@ interface MetadataProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
-const logoImage =
-  "https://www.minharifa.click/_next/static/media/logo.6edfd740.svg";
-
 export async function generateMetadata({
   params: { shortName },
 }: MetadataProps): Promise<Metadata> {
@@ -27,7 +24,9 @@ export async function generateMetadata({
       siteName: response.name,
       locale: "pt_BR",
       url: response.inviteUri,
-      images: logoImage,
+    },
+    appleWebApp: {
+      title: response.name,
     },
   };
 }
