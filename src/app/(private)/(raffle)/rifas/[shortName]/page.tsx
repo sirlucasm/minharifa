@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Wrapper } from "@/components/common/Wrapper";
 import Input from "@/components/common/Input";
 import Button from "@/components/common/Button";
-import { Tooltip } from "@material-tailwind/react";
+import { Progress, Tooltip } from "@material-tailwind/react";
 import { message } from "antd";
 
 import useAuth from "@/hooks/useAuth";
@@ -37,6 +37,7 @@ import { createRaffleUserSchema } from "@/schemas/raffle";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import useModalManager from "@/hooks/useModalManager";
 import InvitesModal from "./components/InvitesModal";
+import Divider from "@/components/common/Divider";
 
 interface ShowRaffleProps {
   params: {
@@ -172,13 +173,13 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
             <h3 className="text-xl font-semibold text-gray-dark">
               {raffle?.name}
             </h3>
-            <p className="text-sm text-gray italic">{raffle?.shortName}</p>
+            <p className="text-sm text-gray italic">/{raffle?.shortName}</p>
           </div>
           {raffle?.type === "number" && (
             <div className="flex items-center gap-1 mt-5">
               <Image src={PersonIcon} alt="Person icon" className="w-3" />
               <span className="text-xs text-gray font-semibold">
-                {raffle.quantity}
+                {raffleUserNumbers.length}/{raffle.quantity}
               </span>
             </div>
           )}
@@ -190,6 +191,39 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
               })}
               /rifa
             </span>
+          </div>
+        </div>
+
+        <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 flex flex-col items-center sm:flex-row gap-2 sm:gap-6">
+          <div>
+            <h3 className="text-xl font-bold text-gray">
+              {(
+                raffleUserNumbers.length * parseInt(raffle?.value as string)
+              ).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </h3>
+          </div>
+          {!!raffle && raffle.quantity && (
+            <Progress
+              value={
+                (raffle.quantity * parseInt(raffle.value)) /
+                (raffleUserNumbers.length * parseInt(raffle?.value as string))
+              }
+              size="lg"
+              className="[&>div]:bg-primary"
+            />
+          )}
+          <div>
+            <h3 className="text-xl font-semibold text-gray">
+              {(
+                (raffle?.quantity || 1) * parseInt(raffle?.value as string)
+              ).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </h3>
           </div>
         </div>
 
@@ -257,7 +291,7 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
           </form>
         )}
       </div>
-      <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6 h-52">
+      <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6 h-60 xs:h-52">
         <div>
           <h3 className="text-lg text-gray-dark max-w-sm">
             Convide pessoas para gerenciar com você
