@@ -37,7 +37,6 @@ import { createRaffleUserSchema } from "@/schemas/raffle";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import useModalManager from "@/hooks/useModalManager";
 import InvitesModal from "./components/InvitesModal";
-import Divider from "@/components/common/Divider";
 
 interface ShowRaffleProps {
   params: {
