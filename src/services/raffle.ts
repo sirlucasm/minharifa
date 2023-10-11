@@ -53,6 +53,16 @@ class RaffleService {
     });
   };
 
+  deleteRaffle = async (raffleId: string) => {
+    const raffleDoc = doc(rafflesRef, raffleId);
+
+    await updateDoc(raffleDoc, {
+      isDeleted: true,
+      deletedAt: new Date(),
+      updatedAt: new Date(),
+    });
+  };
+
   listRaffle = async (userId: string) => {
     const q = query(
       rafflesRef,

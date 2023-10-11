@@ -7,7 +7,22 @@ import Image from "next/image";
 import { Wrapper } from "@/components/common/Wrapper";
 import Input from "@/components/common/Input";
 import Button from "@/components/common/Button";
-import { Badge, Progress, Spinner, Tooltip } from "@material-tailwind/react";
+import {
+  Badge,
+  Breadcrumbs,
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  DialogHeader,
+  IconButton,
+  Menu,
+  MenuHandler,
+  MenuItem,
+  MenuList,
+  Progress,
+  Spinner,
+  Tooltip,
+} from "@material-tailwind/react";
 import { message } from "antd";
 
 import useAuth from "@/hooks/useAuth";
@@ -24,6 +39,7 @@ import PersonIcon from "@/assets/icons/person.svg?url";
 import HeartIcon from "@/assets/icons/heart.svg?url";
 import CopyIcon from "@/assets/icons/copy.svg?url";
 import MenuIcon from "@/assets/icons/profile.svg?url";
+import MenuDotHorizontalIcon from "@/assets/icons/menu-dot-horizontal.svg?url";
 
 import {
   DocumentData,
@@ -39,6 +55,7 @@ import { createRaffleUserSchema } from "@/schemas/raffle";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import useModalManager from "@/hooks/useModalManager";
 import InvitesModal from "./components/InvitesModal";
+import Link from "next/link";
 
 interface ShowRaffleProps {
   params: {
@@ -57,6 +74,8 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
 
   const router = useRouter();
   const { setIsOpenInvitesModal, isOpenInvitesModal } = useModalManager();
+  const [showConfirmRaffleDeleteDialog, setShowConfirmRaffleDeleteDialog] =
+    useState(false);
 
   const { currentUser } = useAuth();
   const [raffle, setRaffle] = useState<IRaffle | undefined>();
@@ -64,6 +83,7 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
   const [raffleInvites, setRaffleInvites] = useState<IRaffleInvite[]>([]);
   const [isLoadingRaffle, setIsLoadingRaffle] = useState(false);
   const [isLoadingSaveRaffleUser, setIsLoadingSaveRaffleUser] = useState(false);
+  const [isLoadingDeleteRaffle, setIsLoadingDeleteRaffle] = useState(false);
 
   const {
     register,
@@ -150,6 +170,20 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
     [raffle, reset]
   );
 
+  const handleDeleteRaffle = useCallback(async () => {
+    if (!raffle) return;
+    setIsLoadingDeleteRaffle(true);
+    try {
+      await raffleService.deleteRaffle(raffle.id);
+      message.success("A Rifa foi excluída com sucesso");
+      router.replace(routes.private.raffle.list);
+    } catch (error: any) {
+      message.error(error.message);
+    } finally {
+      setIsLoadingDeleteRaffle(false);
+    }
+  }, [raffle, router]);
+
   const handleCopyInviteLink = useCallback(() => {
     if (!window) return;
     window.navigator.clipboard.writeText(raffle?.inviteUri as string);
@@ -158,6 +192,10 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
   const handleOpenInvitesModal = useCallback(() => {
     setIsOpenInvitesModal(!isOpenInvitesModal);
   }, [isOpenInvitesModal, setIsOpenInvitesModal]);
+
+  const handleOpenConfirmRaffleDeleteDialog = useCallback(() => {
+    setShowConfirmRaffleDeleteDialog(!showConfirmRaffleDeleteDialog);
+  }, [showConfirmRaffleDeleteDialog, setShowConfirmRaffleDeleteDialog]);
 
   useEffect(() => {
     if (!raffle) return;
@@ -187,9 +225,18 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
   }, [fetchRaffleInvites]);
 
   return (
-    <Wrapper className="flex flex-col lg:flex-row gap-4 mb-10 w-full">
-      <div className="">
-        <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6">
+    <Wrapper className="flex mt-5 flex-col lg:flex-row gap-4 mb-10 w-full">
+      <div>
+        <Breadcrumbs>
+          <Link href={routes.private.home} className="opacity-60">
+            Inicio
+          </Link>
+          <Link href={routes.private.raffle.list} className="opacity-60">
+            Rifas
+          </Link>
+          <Link href={routes.private.raffle.show(shortName)}>{shortName}</Link>
+        </Breadcrumbs>
+        <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 relative">
           <div>
             <h3 className="text-xl font-semibold text-gray-dark">
               {raffle?.name}
@@ -213,6 +260,23 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
               /rifa
             </span>
           </div>
+          <Menu>
+            <MenuHandler>
+              <IconButton className="!absolute right-2 top-3" variant="text">
+                <Image
+                  src={MenuDotHorizontalIcon}
+                  alt="MenuDotHorizontal icon"
+                  className="w-12"
+                />
+              </IconButton>
+            </MenuHandler>
+            <MenuList>
+              <MenuItem>Editar</MenuItem>
+              <MenuItem onClick={handleOpenConfirmRaffleDeleteDialog}>
+                Excluir
+              </MenuItem>
+            </MenuList>
+          </Menu>
         </div>
 
         <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 flex flex-col items-center sm:flex-row gap-2 sm:gap-6">
@@ -314,7 +378,7 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
           </form>
         )}
       </div>
-      <div className="mt-5 w-full">
+      <div className="mt-5 lg:mt-14 w-full">
         <div className=" bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6 h-60 xs:h-52">
           <div>
             <h3 className="text-lg text-gray-dark max-w-sm">
@@ -395,6 +459,23 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
           )}
         </div>
       </div>
+      <Dialog
+        open={showConfirmRaffleDeleteDialog}
+        handler={handleOpenConfirmRaffleDeleteDialog}
+      >
+        <DialogHeader>Excluir rifa</DialogHeader>
+        <DialogBody>Tem certeza que deseja excluir esta rifa?</DialogBody>
+        <DialogFooter className="space-x-2">
+          <Button onClick={handleOpenConfirmRaffleDeleteDialog}>Não</Button>
+          <Button
+            colorVariant="outlined"
+            isLoading={isLoadingDeleteRaffle}
+            onClick={handleDeleteRaffle}
+          >
+            Sim
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </Wrapper>
   );
 }
