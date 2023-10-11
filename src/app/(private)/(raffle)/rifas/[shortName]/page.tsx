@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Wrapper } from "@/components/common/Wrapper";
 import Input from "@/components/common/Input";
 import Button from "@/components/common/Button";
-import { Progress, Spinner, Tooltip } from "@material-tailwind/react";
+import { Badge, Progress, Spinner, Tooltip } from "@material-tailwind/react";
 import { message } from "antd";
 
 import useAuth from "@/hooks/useAuth";
@@ -15,6 +15,7 @@ import raffleService from "@/services/raffle";
 import {
   CreateRaffleUserDto,
   IRaffle,
+  IRaffleInvite,
   IRaffleUser,
 } from "@/@types/raffle.type";
 import cx from "classix";
@@ -60,6 +61,7 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
   const { currentUser } = useAuth();
   const [raffle, setRaffle] = useState<IRaffle | undefined>();
   const [raffleUsers, setRaffleUsers] = useState<IRaffleUser[]>([]);
+  const [raffleInvites, setRaffleInvites] = useState<IRaffleInvite[]>([]);
   const [isLoadingRaffle, setIsLoadingRaffle] = useState(false);
   const [isLoadingSaveRaffleUser, setIsLoadingSaveRaffleUser] = useState(false);
 
@@ -107,6 +109,13 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
       setIsLoadingRaffle(false);
     }
   }, [currentUser, shortName, router]);
+
+  const fetchRaffleInvites = useCallback(async () => {
+    if (!raffle) return;
+    const response = await raffleService.getInviteRequestsAndUser(raffle.id);
+
+    setRaffleInvites(response);
+  }, [raffle]);
 
   const handleAddRaffleUser = useCallback(
     async (value: number) => {
@@ -172,6 +181,10 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
   useEffect(() => {
     fetchRaffle();
   }, [fetchRaffle]);
+
+  useEffect(() => {
+    fetchRaffleInvites();
+  }, [fetchRaffleInvites]);
 
   return (
     <Wrapper className="flex flex-col lg:flex-row gap-4 mb-10 w-full">
@@ -324,18 +337,25 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
               <Image src={CopyIcon} alt="Copy Icon" className="w-5" />
             </Button>
           </div>
-          <Button
-            colorVariant="ghost"
-            size="sm"
-            className="mt-3"
-            onClick={handleOpenInvitesModal}
-          >
-            Gerenciar convites
-          </Button>
+          <div className="mt-4">
+            <Badge
+              invisible={!raffleInvites.length}
+              content={raffleInvites.length}
+            >
+              <Button
+                colorVariant="ghost"
+                size="sm"
+                onClick={handleOpenInvitesModal}
+              >
+                Gerenciar convites
+              </Button>
+            </Badge>
+          </div>
           <InvitesModal
             open={isOpenInvitesModal}
             handler={handleOpenInvitesModal}
-            raffleId={raffle?.id}
+            raffleInvites={raffleInvites}
+            fetchRaffleInvites={fetchRaffleInvites}
           />
         </div>
 

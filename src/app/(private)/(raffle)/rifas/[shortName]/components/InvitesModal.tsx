@@ -1,10 +1,10 @@
+import { useCallback } from "react";
 import Image from "next/image";
 import {
   Dialog,
   DialogBody,
   DialogHeader,
   IconButton,
-  Spinner,
 } from "@material-tailwind/react";
 import { message } from "antd";
 
@@ -13,40 +13,29 @@ import MenuIcon from "@/assets/icons/profile.svg?url";
 import CheckWhiteIcon from "@/assets/icons/check-white.svg?url";
 import CloseWhiteIcon from "@/assets/icons/close-white.svg?url";
 
-import { useCallback, useEffect, useState } from "react";
 import { IRaffleInvite } from "@/@types/raffle.type";
 import raffleService from "@/services/raffle";
 
 interface InvitesModalProps {
   open: boolean;
   handler: () => void;
-  raffleId: string | undefined;
+  raffleInvites: IRaffleInvite[];
+  fetchRaffleInvites: () => void;
 }
 
 export default function InvitesModal({
   open,
   handler,
-  raffleId,
+  raffleInvites,
+  fetchRaffleInvites,
 }: InvitesModalProps) {
-  const [invites, setInvites] = useState<IRaffleInvite[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const fetchRaffleInvites = useCallback(async () => {
-    if (!raffleId) return;
-    setIsLoading(true);
-    const response = await raffleService.getInviteRequestsAndUser(raffleId);
-
-    setInvites(response);
-    setIsLoading(false);
-  }, [raffleId]);
-
   const handleAcceptInviteRequest = useCallback(
     async (invite: IRaffleInvite) => {
-      if (!raffleId) return;
+      if (!invite) return;
       try {
         await raffleService.acceptRaffleInviteRequest({
           invitatedUserId: invite.userId,
-          raffleId: raffleId,
+          raffleId: invite.raffleId,
           inviteId: invite.id,
         });
         message.success("Convite aceito com sucesso");
@@ -56,7 +45,7 @@ export default function InvitesModal({
         message.error(error.message);
       }
     },
-    [raffleId, handler, fetchRaffleInvites]
+    [handler, fetchRaffleInvites]
   );
 
   const handleCancelInviteRequest = useCallback(
@@ -72,10 +61,6 @@ export default function InvitesModal({
     },
     [handler, fetchRaffleInvites]
   );
-
-  useEffect(() => {
-    fetchRaffleInvites();
-  }, [fetchRaffleInvites]);
 
   return (
     <Dialog open={open} handler={handler}>
@@ -93,49 +78,45 @@ export default function InvitesModal({
         </IconButton>
       </DialogHeader>
       <DialogBody className="pt-0">
-        {isLoading ? (
-          <Spinner />
-        ) : (
-          <div className="flex flex-col gap-2">
-            {!invites.length ? (
-              <div>
-                <span className="text-xs text-gray italic">
-                  Nenhum pedido para participar
+        <div className="flex flex-col gap-2">
+          {!raffleInvites.length ? (
+            <div>
+              <span className="text-xs text-gray italic">
+                Nenhuma solicitação de participação da rifa
+              </span>
+            </div>
+          ) : (
+            raffleInvites.map((invite) => (
+              <div key={invite.id} className="flex items-center gap-3">
+                <Image
+                  priority
+                  src={invite.user.profileImageUrl || MenuIcon}
+                  alt="Profile image"
+                  className="w-6 rounded-full"
+                />
+                <span className="text-md text-gray font-semibold">
+                  {invite.user.username}
                 </span>
-              </div>
-            ) : (
-              invites.map((invite) => (
-                <div key={invite.id} className="flex items-center gap-3">
-                  <Image
-                    priority
-                    src={invite.user.profileImageUrl || MenuIcon}
-                    alt="Profile image"
-                    className="w-6 rounded-full"
-                  />
-                  <span className="text-md text-gray font-semibold">
-                    {invite.user.username}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <IconButton
-                      className="rounded-full bg-danger"
-                      size="sm"
-                      onClick={() => handleCancelInviteRequest(invite)}
-                    >
-                      <Image src={CloseWhiteIcon} alt="Close white icon" />
-                    </IconButton>
-                    <IconButton
-                      className="rounded-full bg-success"
-                      size="sm"
-                      onClick={() => handleAcceptInviteRequest(invite)}
-                    >
-                      <Image src={CheckWhiteIcon} alt="Check white icon" />
-                    </IconButton>
-                  </div>
+                <div className="flex items-center gap-1">
+                  <IconButton
+                    className="rounded-full bg-danger"
+                    size="sm"
+                    onClick={() => handleCancelInviteRequest(invite)}
+                  >
+                    <Image src={CloseWhiteIcon} alt="Close white icon" />
+                  </IconButton>
+                  <IconButton
+                    className="rounded-full bg-success"
+                    size="sm"
+                    onClick={() => handleAcceptInviteRequest(invite)}
+                  >
+                    <Image src={CheckWhiteIcon} alt="Check white icon" />
+                  </IconButton>
                 </div>
-              ))
-            )}
-          </div>
-        )}
+              </div>
+            ))
+          )}
+        </div>
       </DialogBody>
     </Dialog>
   );
