@@ -32,7 +32,6 @@ export default function SignIn() {
 
   const onSubmit: SubmitHandler<LoginUserDto> = useCallback(async (data) => {
     setIsLoading(true);
-    console.log(data);
     try {
       await authService.signInUser(data);
     } catch (error: any) {

@@ -195,7 +195,8 @@ class RaffleService {
     const q = query(
       raffleInvitesRef,
       where("raffleId", "==", raffleId),
-      where("isCanceled", "==", false)
+      where("isCanceled", "==", false),
+      where("accepted", "==", false)
     );
 
     const querySnapshot = await getDocs(q);

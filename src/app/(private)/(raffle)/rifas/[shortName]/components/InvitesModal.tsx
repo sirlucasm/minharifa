@@ -32,13 +32,13 @@ export default function InvitesModal({
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchRaffleInvites = useCallback(async () => {
-    if (!raffleId || !open) return;
+    if (!raffleId) return;
     setIsLoading(true);
     const response = await raffleService.getInviteRequestsAndUser(raffleId);
 
     setInvites(response);
     setIsLoading(false);
-  }, [raffleId, open]);
+  }, [raffleId]);
 
   const handleAcceptInviteRequest = useCallback(
     async (invite: IRaffleInvite) => {
@@ -50,12 +50,13 @@ export default function InvitesModal({
           inviteId: invite.id,
         });
         message.success("Convite aceito com sucesso");
+        fetchRaffleInvites();
         handler();
       } catch (error: any) {
         message.error(error.message);
       }
     },
-    [raffleId, handler]
+    [raffleId, handler, fetchRaffleInvites]
   );
 
   const handleCancelInviteRequest = useCallback(
@@ -63,12 +64,13 @@ export default function InvitesModal({
       try {
         await raffleService.cancelRaffleInviteRequest(invite.id);
         message.success("Convite recusado com sucesso");
+        fetchRaffleInvites();
         handler();
       } catch (error: any) {
         message.error(error.message);
       }
     },
-    [handler]
+    [handler, fetchRaffleInvites]
   );
 
   useEffect(() => {

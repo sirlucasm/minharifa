@@ -354,7 +354,7 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
               </span>
             </div>
           ) : (
-            <div className="flex flex-wrap justify-start">
+            <div className="flex flex-wrap justify-start gap-4">
               {raffle.participants.map((participant) => (
                 <div
                   key={participant.id}
