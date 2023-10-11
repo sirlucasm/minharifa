@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Wrapper } from "@/components/common/Wrapper";
 import Input from "@/components/common/Input";
 import Button from "@/components/common/Button";
-import { Progress, Tooltip } from "@material-tailwind/react";
+import { Progress, Spinner, Tooltip } from "@material-tailwind/react";
 import { message } from "antd";
 
 import useAuth from "@/hooks/useAuth";
@@ -22,6 +22,7 @@ import cx from "classix";
 import PersonIcon from "@/assets/icons/person.svg?url";
 import HeartIcon from "@/assets/icons/heart.svg?url";
 import CopyIcon from "@/assets/icons/copy.svg?url";
+import MenuIcon from "@/assets/icons/profile.svg?url";
 
 import {
   DocumentData,
@@ -59,6 +60,8 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
   const { currentUser } = useAuth();
   const [raffle, setRaffle] = useState<IRaffle | undefined>();
   const [raffleUsers, setRaffleUsers] = useState<IRaffleUser[]>([]);
+  const [isLoadingRaffle, setIsLoadingRaffle] = useState(false);
+  const [isLoadingSaveRaffleUser, setIsLoadingSaveRaffleUser] = useState(false);
 
   const {
     register,
@@ -93,12 +96,15 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
 
   const fetchRaffle = useCallback(async () => {
     if (!currentUser) return;
+    setIsLoadingRaffle(true);
     try {
       const response = await raffleService.getRaffle(shortName, currentUser.id);
       setRaffle(response);
     } catch (error: any) {
       message.error(error.message);
       router.replace(routes.private.home);
+    } finally {
+      setIsLoadingRaffle(false);
     }
   }, [currentUser, shortName, router]);
 
@@ -118,6 +124,7 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
   const onSubmit: SubmitHandler<CreateRaffleUserDto> = useCallback(
     async (data) => {
       if (!raffle) return;
+      setIsLoadingSaveRaffleUser(true);
       try {
         await raffleService.createRaffleUser({
           ...data,
@@ -127,6 +134,8 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
         reset({ numbers: [] });
       } catch (error: any) {
         message.error(error.message);
+      } finally {
+        setIsLoadingSaveRaffleUser(false);
       }
     },
     [raffle, reset]
@@ -285,46 +294,86 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
                   </span>
                 )}
               </div>
-              <Button type="submit">Salvar</Button>
+              <Button type="submit" isLoading={isLoadingSaveRaffleUser}>
+                Salvar
+              </Button>
             </div>
           </form>
         )}
       </div>
-      <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6 h-60 xs:h-52">
-        <div>
-          <h3 className="text-lg text-gray-dark max-w-sm">
-            Convide pessoas para gerenciar com você
-          </h3>
-        </div>
-        <div className="mt-5 relative">
-          <Input
-            variant="outlined"
-            defaultValue={raffle?.inviteUri}
-            className="pr-14"
-            disabled
-          />
+      <div className="mt-5 w-full">
+        <div className=" bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6 h-60 xs:h-52">
+          <div>
+            <h3 className="text-lg text-gray-dark max-w-sm">
+              Convide pessoas para gerenciar com você
+            </h3>
+          </div>
+          <div className="mt-5 relative">
+            <Input
+              variant="outlined"
+              defaultValue={raffle?.inviteUri}
+              className="pr-14"
+              disabled
+            />
+            <Button
+              colorVariant="ghost"
+              className="!absolute right-1 top-1 rounded"
+              size="sm"
+              onClick={handleCopyInviteLink}
+            >
+              <Image src={CopyIcon} alt="Copy Icon" className="w-5" />
+            </Button>
+          </div>
           <Button
             colorVariant="ghost"
-            className="!absolute right-1 top-1 rounded"
             size="sm"
-            onClick={handleCopyInviteLink}
+            className="mt-3"
+            onClick={handleOpenInvitesModal}
           >
-            <Image src={CopyIcon} alt="Copy Icon" className="w-5" />
+            Gerenciar convites
           </Button>
+          <InvitesModal
+            open={isOpenInvitesModal}
+            handler={handleOpenInvitesModal}
+            raffleId={raffle?.id}
+          />
         </div>
-        <Button
-          colorVariant="ghost"
-          size="sm"
-          className="mt-3"
-          onClick={handleOpenInvitesModal}
-        >
-          Gerenciar convites
-        </Button>
-        <InvitesModal
-          open={isOpenInvitesModal}
-          handler={handleOpenInvitesModal}
-          raffleId={raffle?.id}
-        />
+
+        <div className=" mt-5 bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6 h-auto">
+          <div className="mb-5">
+            <h3 className="text-lg text-gray-dark max-w-sm">Participantes</h3>
+          </div>
+          {isLoadingRaffle ? (
+            <div className="flex justify-center">
+              <Spinner />
+            </div>
+          ) : !raffle?.sharedUsers.length ? (
+            <div>
+              <span className="text-xs text-gray italic">
+                Você ainda não possui participantes
+              </span>
+            </div>
+          ) : (
+            <div className="flex flex-wrap justify-start">
+              {raffle.participants.map((participant) => (
+                <div
+                  key={participant.id}
+                  className="flex flex-col items-center gap-2 cursor-pointer select-none"
+                >
+                  <Image
+                    priority
+                    src={participant.profileImageUrl || MenuIcon}
+                    alt="Profile image"
+                    className="w-14 rounded-full bg-gray-light p-2"
+                  />
+                  <span className="text-sm text-gray font-semibold">
+                    {participant.username}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </Wrapper>
   );

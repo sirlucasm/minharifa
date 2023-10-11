@@ -18,6 +18,7 @@ export interface IRaffle {
   inviteUri: string;
   inviteCode: string;
   sharedUsers: string[];
+  participants: IUser[];
   updatedAt: Timestamp;
   createdAt: Timestamp;
   deletedAt: Timestamp;
