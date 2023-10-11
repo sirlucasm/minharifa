@@ -1,10 +1,15 @@
 import * as yup from "yup";
 
 export const loginUserSchema = yup.object({
-  email: yup
-    .string()
-    .email("E-mail inválido")
-    .required("Você deve digitar seu e-mail"),
+  emailOrUsername: yup.lazy((emailOrUsername: string) => {
+    if (emailOrUsername.includes("@")) {
+      return yup
+        .string()
+        .email("E-mail inválido")
+        .required("Você deve digitar seu usuário/e-mail");
+    }
+    return yup.string().required("Você deve digitar seu usuário/e-mail");
+  }),
   password: yup.string().required("Você deve digitar sua senha"),
 });
 

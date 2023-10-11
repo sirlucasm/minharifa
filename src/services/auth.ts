@@ -43,7 +43,7 @@ class AuthService {
 
     const q = query(
       usersRef,
-      where(isEmail ? "email" : "phoneNumber", "==", emailOrUsername)
+      where(isEmail ? "email" : "username", "==", emailOrUsername)
     );
 
     const querySnapshot = await getDocs(q);
@@ -112,15 +112,15 @@ class AuthService {
     setStorage("last_logged_email", email);
   };
 
-  signInUser = async ({ email, password }: LoginUserDto) => {
-    const { user, userDoc } = await this.getUser(email);
+  signInUser = async ({ emailOrUsername, password }: LoginUserDto) => {
+    const { user, userDoc } = await this.getUser(emailOrUsername);
 
     if (!user) throw ERRORS.accountIncorrectCredentials;
 
     let loggedUser;
     try {
-      loggedUser = await signInWithEmailAndPassword(auth, email, password);
-      setStorage("last_logged_email", email);
+      loggedUser = await signInWithEmailAndPassword(auth, user.email, password);
+      setStorage("last_logged_email", emailOrUsername);
     } catch (error: any) {
       if (FIREBASE_ERRORS.auth.includes(error?.code))
         throw ERRORS.accountIncorrectCredentials;

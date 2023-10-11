@@ -54,22 +54,22 @@ export default function SignIn() {
         >
           <Image
             src={LogoImage}
-            alt="Todo List"
+            alt="App Logo"
             priority
             className="w-44 lg:w-56"
           />
           <div className="lg:w-full">
             <Input
-              {...register("email")}
+              {...register("emailOrUsername")}
               label="E-mail"
-              type="email"
+              type="text"
               containerProps={{ className: "mt-5" }}
-              error={!!errors.email?.message}
+              error={!!errors.emailOrUsername?.message}
               maxLength={100}
             />
-            {errors.email?.message && (
+            {errors.emailOrUsername && (
               <span className="text-danger text-xs">
-                {errors.email.message}
+                {errors.emailOrUsername.message}
               </span>
             )}
           </div>
@@ -81,7 +81,7 @@ export default function SignIn() {
               error={!!errors.password?.message}
               maxLength={100}
             />
-            {errors.password?.message && (
+            {errors.password && (
               <span className="text-danger text-xs">
                 {errors.password.message}
               </span>

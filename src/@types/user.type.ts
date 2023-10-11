@@ -20,7 +20,7 @@ export type IUser = {
 export type IAuthenticatedUser = User & IUser;
 
 export interface LoginUserDto {
-  email: string;
+  emailOrUsername: string;
   password: string;
 }
 
