@@ -30,7 +30,8 @@ export default function SignIn() {
     mode: "onChange",
   });
 
-  const onSubmit: SubmitHandler<LoginUserDto> = useCallback(async (data) => {
+  const onSubmit: SubmitHandler<LoginUserDto> = useCallback(async (data, e) => {
+    e?.preventDefault();
     setIsLoading(true);
     try {
       await authService.signInUser(data);

@@ -32,7 +32,8 @@ export default function CreateAccount() {
   });
 
   const onSubmit: SubmitHandler<CreateUserDto> = useCallback(
-    async (data) => {
+    async (data, e) => {
+      e?.preventDefault();
       setIsLoading(true);
       try {
         await authService.createUser(data);

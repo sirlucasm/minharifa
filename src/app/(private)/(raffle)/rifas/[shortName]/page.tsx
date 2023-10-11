@@ -44,6 +44,8 @@ import MenuDotHorizontalIcon from "@/assets/icons/menu-dot-horizontal.svg?url";
 import {
   DocumentData,
   collection,
+  doc,
+  getDoc,
   onSnapshot,
   query,
   where,
@@ -130,13 +132,6 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
     }
   }, [currentUser, shortName, router]);
 
-  const fetchRaffleInvites = useCallback(async () => {
-    if (!raffle) return;
-    const response = await raffleService.getInviteRequestsAndUser(raffle.id);
-
-    setRaffleInvites(response);
-  }, [raffle]);
-
   const handleAddRaffleUser = useCallback(
     async (value: number) => {
       if (raffleUserNumbers.includes(value)) return;
@@ -221,8 +216,27 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
   }, [fetchRaffle]);
 
   useEffect(() => {
-    fetchRaffleInvites();
-  }, [fetchRaffleInvites]);
+    if (!raffle) return;
+    const raffleInvitesRef = collection(db, "raffleInvites");
+    const q = query(
+      raffleInvitesRef,
+      where("raffleId", "==", raffle.id),
+      where("isCanceled", "==", false),
+      where("accepted", "==", false)
+    );
+    const unsub = onSnapshot(q, (snapshot) => {
+      const invites: DocumentData[] = [];
+      snapshot.forEach(async (response) => {
+        const data = response.data();
+        const user = await getDoc(doc(db, "users", data.userId));
+        data.user = user.data();
+        invites.push(data);
+      });
+      setRaffleInvites(invites as IRaffleInvite[]);
+    });
+
+    return () => unsub();
+  }, [raffle, shortName]);
 
   return (
     <Wrapper className="flex mt-5 flex-col lg:flex-row gap-4 mb-10 w-full">
@@ -419,7 +433,6 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
             open={isOpenInvitesModal}
             handler={handleOpenInvitesModal}
             raffleInvites={raffleInvites}
-            fetchRaffleInvites={fetchRaffleInvites}
           />
         </div>
 
@@ -431,7 +444,7 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
             <div className="flex justify-center">
               <Spinner />
             </div>
-          ) : !raffle?.sharedUsers.length ? (
+          ) : raffle?.sharedUsers && !raffle.sharedUsers.length ? (
             <div>
               <span className="text-xs text-gray italic">
                 Você ainda não possui participantes
@@ -439,22 +452,23 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
             </div>
           ) : (
             <div className="flex flex-wrap justify-start gap-4">
-              {raffle.participants.map((participant) => (
-                <div
-                  key={participant.id}
-                  className="flex flex-col items-center gap-2 cursor-pointer select-none"
-                >
-                  <Image
-                    priority
-                    src={participant.profileImageUrl || MenuIcon}
-                    alt="Profile image"
-                    className="w-14 rounded-full bg-gray-light p-2"
-                  />
-                  <span className="text-sm text-gray font-semibold">
-                    {participant.username}
-                  </span>
-                </div>
-              ))}
+              {!!raffle &&
+                raffle.participants.map((participant) => (
+                  <div
+                    key={participant.id}
+                    className="flex flex-col items-center gap-2 cursor-pointer select-none"
+                  >
+                    <Image
+                      priority
+                      src={participant.profileImageUrl || MenuIcon}
+                      alt="Profile image"
+                      className="w-14 rounded-full bg-gray-light p-2"
+                    />
+                    <span className="text-sm text-gray font-semibold">
+                      {participant.username}
+                    </span>
+                  </div>
+                ))}
             </div>
           )}
         </div>

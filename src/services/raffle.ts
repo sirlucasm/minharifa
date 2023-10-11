@@ -106,10 +106,12 @@ class RaffleService {
 
     const participants: IUser[] = [];
 
-    raffle.sharedUsers.forEach(async (userId) => {
-      const users = await getDoc(doc(db, "users", userId));
-      participants.push(users.data() as IUser);
-    });
+    if (raffle.sharedUsers) {
+      raffle.sharedUsers.forEach(async (userId) => {
+        const users = await getDoc(doc(db, "users", userId));
+        participants.push(users.data() as IUser);
+      });
+    }
 
     raffle.participants = participants;
 

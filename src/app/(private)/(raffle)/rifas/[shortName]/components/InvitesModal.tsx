@@ -20,14 +20,12 @@ interface InvitesModalProps {
   open: boolean;
   handler: () => void;
   raffleInvites: IRaffleInvite[];
-  fetchRaffleInvites: () => void;
 }
 
 export default function InvitesModal({
   open,
   handler,
   raffleInvites,
-  fetchRaffleInvites,
 }: InvitesModalProps) {
   const handleAcceptInviteRequest = useCallback(
     async (invite: IRaffleInvite) => {
@@ -39,13 +37,12 @@ export default function InvitesModal({
           inviteId: invite.id,
         });
         message.success("Convite aceito com sucesso");
-        fetchRaffleInvites();
         handler();
       } catch (error: any) {
         message.error(error.message);
       }
     },
-    [handler, fetchRaffleInvites]
+    [handler]
   );
 
   const handleCancelInviteRequest = useCallback(
@@ -53,13 +50,12 @@ export default function InvitesModal({
       try {
         await raffleService.cancelRaffleInviteRequest(invite.id);
         message.success("Convite recusado com sucesso");
-        fetchRaffleInvites();
         handler();
       } catch (error: any) {
         message.error(error.message);
       }
     },
-    [handler, fetchRaffleInvites]
+    [handler]
   );
 
   return (
