@@ -14,6 +14,7 @@ const routes = {
       show: (slug: string) => `/rifas/${slug}`,
       requestInvite: (slug: string) => `/rifas/${slug}/solicitar-convite`,
       acceptInvite: (slug: string) => `/rifas/${slug}/aceitar-convite`,
+      edit: (slug: string) => `/rifas/${slug}/editar`,
     },
   },
 };

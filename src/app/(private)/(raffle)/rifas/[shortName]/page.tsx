@@ -285,7 +285,9 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
               </IconButton>
             </MenuHandler>
             <MenuList>
-              <MenuItem>Editar</MenuItem>
+              <Link href={routes.private.raffle.edit(shortName)}>
+                <MenuItem>Editar</MenuItem>
+              </Link>
               <MenuItem onClick={handleOpenConfirmRaffleDeleteDialog}>
                 Excluir
               </MenuItem>

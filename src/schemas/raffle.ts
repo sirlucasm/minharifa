@@ -4,7 +4,11 @@ export const createRaffleSchema = yup.object({
   name: yup.string().required("Você deve informar um nome"),
   shortName: yup
     .string()
-    .required("Você deve informar um nome curto para rifa"),
+    .required("Você deve informar um nome curto para rifa")
+    .matches(
+      /^[a-z][-a-z0-9]*$/,
+      "As letras devem ser minúsculas e só permitimos o uso de - como caractere especial"
+    ),
   type: yup
     .string()
     .oneOf(["number", "contactInfo"])
@@ -13,7 +17,7 @@ export const createRaffleSchema = yup.object({
     .string()
     .oneOf(["public", "private"])
     .required("Você deve informar a visibilidade"),
-  quantity: yup.string().when("type", (type, schema) => {
+  quantity: yup.number().when("type", (type, schema) => {
     if (type.includes("number"))
       return schema.required("Você deve informar a quantidade");
 
@@ -36,4 +40,15 @@ export const createRaffleUserSchema = yup.object({
     )
     .min(1, "Você deve informar pelo menos um número")
     .required("Você deve informar um número"),
+});
+
+export const updateRaffleUserSchema = yup.object({
+  name: yup.string().required("Você deve informar um nome"),
+  numbers: yup
+    .string()
+    .required("Você deve informar um número")
+    .matches(
+      /^\d+(,\s*\d+)*$/,
+      "Os números devem ser separados por vírgula. Ex: 23, 24..."
+    ),
 });

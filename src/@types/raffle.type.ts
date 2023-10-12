@@ -29,13 +29,15 @@ export interface CreateRaffleDto {
   name: string;
   type: IRaffleType;
   visibility: IRaffleVisibility;
-  quantity?: string;
+  quantity?: number;
   value: string;
   shortName: string;
   inviteUri: string;
   inviteCode: string;
   userId: string;
 }
+
+export interface UpdateRaffleDto extends Partial<CreateRaffleDto> {}
 
 export interface IRaffleUser {
   id: string;
@@ -45,6 +47,11 @@ export interface IRaffleUser {
   createdAt: Timestamp;
   deletedAt: Timestamp;
   isDeleted: boolean;
+}
+
+export interface UpdateRaffleUserDto {
+  name?: string;
+  numbers?: string;
 }
 
 export interface CreateRaffleUserDto {

@@ -3,6 +3,8 @@ import {
   CreateRaffleUserDto,
   IRaffle,
   IRaffleInvite,
+  UpdateRaffleDto,
+  UpdateRaffleUserDto,
 } from "@/@types/raffle.type";
 import { IUser } from "@/@types/user.type";
 import { db } from "@/configs/firebase";
@@ -44,10 +46,31 @@ class RaffleService {
 
     await setDoc(raffleDoc, {
       ...data,
-      quantity: parseInt(data.quantity as string),
       id: raffleDoc.id,
       createdAt: new Date(),
       isDeleted: false,
+      inviteUri: `${process.env.NEXT_PUBLIC_APP_URL}/rifas/${data.shortName}?cinvitation=${inviteCode}`,
+      inviteCode,
+    });
+  };
+
+  updateRaffle = async (data: UpdateRaffleDto) => {
+    const q = query(
+      rafflesRef,
+      where("shortName", "==", data.shortName),
+      where("isDeleted", "==", false)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) throw ERRORS.raffleNotFound;
+
+    const raffleDoc = querySnapshot.docs[0].ref;
+    const inviteCode = generateInviteCode(12);
+
+    await updateDoc(raffleDoc, {
+      ...data,
+      updatedAt: new Date(),
       inviteUri: `${process.env.NEXT_PUBLIC_APP_URL}/rifas/${data.shortName}?cinvitation=${inviteCode}`,
       inviteCode,
     });
@@ -177,6 +200,31 @@ class RaffleService {
       raffleId: data.raffleId,
       isDeleted: false,
     });
+  };
+
+  updateRaffleUser = async (raffleId: string, data: UpdateRaffleUserDto) => {
+    const splittedNumbers = data.numbers ? data.numbers.split(",") : [];
+    const numbersFormatted = splittedNumbers.map((number) => Number(number));
+
+    const q = query(
+      raffleUsersRef,
+      where("numbers", "array-contains-any", numbersFormatted),
+      where("raffleId", "==", raffleId),
+      where("isDeleted", "==", false)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.size > 1) throw ERRORS.raffleUserNumberAlreadyUsed;
+
+    if (!querySnapshot.empty) {
+      const raffleUsersDoc = querySnapshot.docs[0].ref;
+      await updateDoc(raffleUsersDoc, {
+        name: data.name,
+        numbers: numbersFormatted,
+        updatedAt: new Date(),
+      });
+    }
   };
 
   sendInviteRequest = async (raffleId: string, invitedUserId: string) => {

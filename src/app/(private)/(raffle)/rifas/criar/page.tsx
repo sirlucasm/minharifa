@@ -46,6 +46,7 @@ export default function CreateRaffle() {
         await raffleService.createRaffle({
           ...data,
           userId: currentUser.id,
+          quantity: Number(data.quantity),
         });
         message.success("Rifa criada com sucesso!");
         router.push(routes.private.raffle.show(data.shortName));
