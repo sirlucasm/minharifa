@@ -92,7 +92,17 @@ export default function EditRaffle({ params }: EditRaffleProps) {
     try {
       const response = await raffleService.getRaffle(shortName, currentUser.id);
       setRaffle(response);
-      resetRaffle(response);
+      resetRaffle({
+        inviteCode: response.inviteCode,
+        inviteUri: response.inviteUri,
+        name: response.name,
+        quantity: response.quantity,
+        shortName: response.shortName,
+        type: response.type,
+        userId: response.userId,
+        value: response.value,
+        visibility: response.visibility,
+      });
     } catch (error: any) {
       message.error(error.message);
       router.replace(routes.private.raffle.list);
