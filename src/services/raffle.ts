@@ -183,6 +183,7 @@ class RaffleService {
     const q = query(
       raffleUsersRef,
       where("numbers", "array-contains-any", numbersFormatted),
+      where("raffleId", "==", data.raffleId),
       where("isDeleted", "==", false)
     );
 
