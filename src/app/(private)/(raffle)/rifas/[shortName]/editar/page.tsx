@@ -113,10 +113,8 @@ export default function EditRaffle({ params }: EditRaffleProps) {
         return;
       }
       try {
-        if (!currentUser) return;
         await raffleService.updateRaffle({
           ...data,
-          userId: currentUser.id,
           quantity: Number(data.quantity),
         });
         message.success("Rifa atualizada com sucesso!");
@@ -127,7 +125,7 @@ export default function EditRaffle({ params }: EditRaffleProps) {
         setIsLoadingSaveRaffle(false);
       }
     },
-    [raffle, values.quantity, biggestRaffleUserNumber, currentUser, router]
+    [raffle, values.quantity, biggestRaffleUserNumber, router]
   );
 
   const onSubmitRaffleUser: SubmitHandler<UpdateRaffleUserDto> = useCallback(
