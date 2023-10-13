@@ -1,6 +1,7 @@
 interface StorageKeys {
   last_logged_email: string;
   time_left: string;
+  show_money_progress: string;
 }
 
 export const setStorage = (key: string, value: any) => {

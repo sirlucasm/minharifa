@@ -59,6 +59,7 @@ import useModalManager from "@/hooks/useModalManager";
 import InvitesModal from "./components/InvitesModal";
 import Link from "next/link";
 import moment from "moment";
+import { getStorage, setStorage } from "@/utils/storage";
 
 interface ShowRaffleProps {
   params: {
@@ -79,6 +80,9 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
   const { setIsOpenInvitesModal, isOpenInvitesModal } = useModalManager();
   const [showConfirmRaffleDeleteDialog, setShowConfirmRaffleDeleteDialog] =
     useState(false);
+  const [showMoneyProgress, setShowMoneyProgress] = useState(
+    useMemo(() => getStorage("show_money_progress") || true, [])
+  );
 
   const { currentUser } = useAuth();
   const [raffle, setRaffle] = useState<IRaffle | undefined>();
@@ -225,6 +229,11 @@ ${Array.from(Array(raffle.quantity).keys())
     a.click();
   }, [raffle, raffleUsers]);
 
+  const handleHideMoneyProgress = useCallback(() => {
+    setShowMoneyProgress((prev: boolean) => !prev);
+    setStorage("show_money_progress", !showMoneyProgress);
+  }, [showMoneyProgress]);
+
   useEffect(() => {
     if (!raffle) return;
     const rafflesRef = collection(db, "raffleUsers");
@@ -340,9 +349,17 @@ ${Array.from(Array(raffle.quantity).keys())
           </Menu>
         </div>
 
-        <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 flex flex-col items-center sm:flex-row gap-2 sm:gap-6">
+        <div
+          className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 flex flex-col items-center sm:flex-row gap-2 sm:gap-6"
+          onClick={handleHideMoneyProgress}
+        >
           <div>
-            <h3 className="text-xl font-bold text-gray">
+            <h3
+              className={cx(
+                "text-xl font-semibold text-gray cursor-pointer",
+                !showMoneyProgress && "blur"
+              )}
+            >
               {(
                 raffleUserNumbers.length * parseInt(raffle?.value as string)
               ).toLocaleString("pt-BR", {
@@ -364,7 +381,12 @@ ${Array.from(Array(raffle.quantity).keys())
             />
           )}
           <div>
-            <h3 className="text-xl font-semibold text-gray">
+            <h3
+              className={cx(
+                "text-xl font-semibold text-gray cursor-pointer",
+                !showMoneyProgress && "blur"
+              )}
+            >
               {(
                 (raffle?.quantity || 1) * parseInt(raffle?.value as string)
               ).toLocaleString("pt-BR", {
