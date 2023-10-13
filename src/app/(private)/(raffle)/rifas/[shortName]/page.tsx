@@ -309,8 +309,10 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
           {!!raffle && raffle.quantity && (
             <Progress
               value={
-                (raffle.quantity * parseInt(raffle.value)) /
-                (raffleUserNumbers.length * parseInt(raffle?.value as string))
+                (100 *
+                  parseInt(raffle?.value as string) *
+                  raffleUserNumbers.length) /
+                (raffle.quantity * parseInt(raffle.value))
               }
               size="lg"
               className="[&>div]:bg-primary"
