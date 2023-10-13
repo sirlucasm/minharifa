@@ -58,6 +58,7 @@ import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import useModalManager from "@/hooks/useModalManager";
 import InvitesModal from "./components/InvitesModal";
 import Link from "next/link";
+import moment from "moment";
 
 interface ShowRaffleProps {
   params: {
@@ -192,6 +193,38 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
     setShowConfirmRaffleDeleteDialog(!showConfirmRaffleDeleteDialog);
   }, [showConfirmRaffleDeleteDialog, setShowConfirmRaffleDeleteDialog]);
 
+  const handleExportRaffle = useCallback(() => {
+    if (!raffle) return;
+    const blob = new Blob(
+      [
+        `${raffle.name}
+https://www.minharifa.click/rifas/${raffle.shortName}
+${parseInt(raffle?.value as string).toLocaleString("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+})}/rifa
+
+${Array.from(Array(raffle.quantity).keys())
+  .map((value, index) => {
+    const user = raffleUsers.find((user) => user.numbers.includes(value + 1));
+    return `${index + 1} - ${user ? user.name : ""}\n`;
+  })
+  .join("")}
+`,
+      ],
+      { type: "text/plain" }
+    );
+    const a = document.createElement("a");
+    a.download = `${raffle.shortName}_${moment().format(
+      "DD-MM-YYYY[_]HH.mm.ss"
+    )}.txt`;
+    a.href = URL.createObjectURL(blob);
+    a.addEventListener("click", () => {
+      setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
+    });
+    a.click();
+  }, [raffle, raffleUsers]);
+
   useEffect(() => {
     if (!raffle) return;
     const rafflesRef = collection(db, "raffleUsers");
@@ -285,10 +318,22 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
               </IconButton>
             </MenuHandler>
             <MenuList>
-              <Link href={routes.private.raffle.edit(shortName)}>
+              <MenuItem
+                className="outline-none hover:!outline-none"
+                onClick={handleExportRaffle}
+              >
+                Exportar Rifa
+              </MenuItem>
+              <Link
+                href={routes.private.raffle.edit(shortName)}
+                className="outline-none hover:!outline-none"
+              >
                 <MenuItem>Editar</MenuItem>
               </Link>
-              <MenuItem onClick={handleOpenConfirmRaffleDeleteDialog}>
+              <MenuItem
+                onClick={handleOpenConfirmRaffleDeleteDialog}
+                className="outline-none text-danger hover:!text-danger hover:!outline-none"
+              >
                 Excluir
               </MenuItem>
             </MenuList>
