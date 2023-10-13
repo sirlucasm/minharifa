@@ -404,13 +404,12 @@ ${Array.from(Array(raffle.quantity).keys())
         </div>
 
         {raffle?.type === "number" && raffle.quantity !== undefined && (
-          <div className="mt-5 flex md:w-[480px] flex-wrap gap-2">
+          <div className="mt-5 flex md:w-[480px] flex-wrap gap-1">
             {Array.from(Array(raffle.quantity).keys()).map((value, index) => (
               <div
                 key={index}
                 className={cx(
-                  "border-[1px] border-primary flex items-center justify-center w-8 h-8 cursor-pointer select-none",
-                  (raffle.quantity as number) > 99 && "w-10 h-10",
+                  "border-[1px] border-primary flex items-center justify-center w-9 h-7 cursor-pointer select-none rounded-[4px]",
                   clickedRaffleNumber.includes(value + 1) && "bg-primary",
                   raffleUserNumbers.includes(value + 1) && "cursor-default"
                 )}
@@ -429,7 +428,7 @@ ${Array.from(Array(raffle.quantity).keys())
                 ) : (
                   <span
                     className={cx(
-                      "text-primary text-sm",
+                      "text-primary text-xs font-semibold",
                       clickedRaffleNumber.includes(value + 1) && "text-white"
                     )}
                   >
