@@ -81,7 +81,10 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
   const [showConfirmRaffleDeleteDialog, setShowConfirmRaffleDeleteDialog] =
     useState(false);
   const [showMoneyProgress, setShowMoneyProgress] = useState(
-    useMemo(() => getStorage("show_money_progress") || true, [])
+    useMemo(() => {
+      const moneyProgress = getStorage("show_money_progress");
+      return moneyProgress !== undefined ? (moneyProgress as boolean) : true;
+    }, [])
   );
 
   const { currentUser } = useAuth();
@@ -377,7 +380,10 @@ ${Array.from(Array(raffle.quantity).keys())
                 (raffle.quantity * parseInt(raffle.value))
               }
               size="lg"
-              className="[&>div]:bg-primary"
+              className={cx(
+                "[&>div]:bg-primary",
+                !showMoneyProgress && "blur-[3px]"
+              )}
             />
           )}
           <div>
