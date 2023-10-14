@@ -19,6 +19,7 @@ import useAuth from "@/hooks/useAuth";
 import { message } from "antd";
 import { useRouter } from "next/navigation";
 import routes from "@/routes";
+import { maskValueToCurrency } from "@/utils/currency";
 
 export default function CreateRaffle() {
   const router = useRouter();
@@ -122,6 +123,9 @@ export default function CreateRaffle() {
           <div>
             <Input
               {...register("value")}
+              onChange={(e) => {
+                maskValueToCurrency(e);
+              }}
               error={!!errors.value?.message}
               label="Valor por rifa"
               className="w-[200px]"

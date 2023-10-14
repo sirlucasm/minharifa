@@ -16,6 +16,10 @@ const routes = {
       acceptInvite: (slug: string) => `/rifas/${slug}/aceitar-convite`,
       edit: (slug: string) => `/rifas/${slug}/editar`,
     },
+
+    events: {
+      list: "/eventos",
+    },
   },
 };
 

@@ -4,15 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Wrapper } from "@/components/common/Wrapper";
+import { Spinner } from "@material-tailwind/react";
+import Divider from "@/components/common/Divider";
+
+import PlusIcon from "@/assets/icons/plus.svg?url";
+import PersonIcon from "@/assets/icons/person.svg?url";
 
 import { IRaffle } from "@/@types/raffle.type";
 import raffleService from "@/services/raffle";
 import useAuth from "@/hooks/useAuth";
 import routes from "@/routes";
-import Divider from "@/components/common/Divider";
-import PlusIcon from "@/assets/icons/plus.svg?url";
-import PersonIcon from "@/assets/icons/person.svg?url";
-import { Spinner } from "@material-tailwind/react";
+import { convertNumberToCurrency } from "@/utils/currency";
 
 export default function Raffle() {
   const { currentUser } = useAuth();
@@ -76,10 +78,7 @@ export default function Raffle() {
                       </div>
                     )}
                     <span className="text-xs text-gray font-semibold">
-                      {parseInt(raffle.value).toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
+                      {convertNumberToCurrency(raffle.value)}
                       /rifa
                     </span>
                   </div>

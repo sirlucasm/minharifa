@@ -12,7 +12,7 @@ export interface IRaffle {
   type: IRaffleType;
   visibility: IRaffleVisibility;
   quantity?: number;
-  value: string;
+  value: number;
   shortName: string;
   userId: string;
   inviteUri: string;
@@ -30,7 +30,7 @@ export interface CreateRaffleDto {
   type: IRaffleType;
   visibility: IRaffleVisibility;
   quantity?: number;
-  value: string;
+  value: number;
   shortName: string;
   inviteUri: string;
   inviteCode: string;

@@ -60,6 +60,7 @@ import InvitesModal from "./components/InvitesModal";
 import Link from "next/link";
 import moment from "moment";
 import { getStorage, setStorage } from "@/utils/storage";
+import { convertNumberToCurrency } from "@/utils/currency";
 
 interface ShowRaffleProps {
   params: {
@@ -206,10 +207,7 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
       [
         `${raffle.name}
 https://www.minharifa.click/rifas/${raffle.shortName}
-${parseInt(raffle?.value as string).toLocaleString("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-})}/rifa
+${convertNumberToCurrency(raffle?.value)}/rifa
 
 ${Array.from(Array(raffle.quantity).keys())
   .map((value, index) => {
@@ -312,10 +310,7 @@ ${Array.from(Array(raffle.quantity).keys())
           )}
           <div>
             <span className="text-xs text-gray font-semibold">
-              {parseInt(raffle?.value as string).toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
+              {convertNumberToCurrency(raffle?.value)}
               /rifa
             </span>
           </div>
@@ -363,21 +358,16 @@ ${Array.from(Array(raffle.quantity).keys())
                 !showMoneyProgress && "blur"
               )}
             >
-              {(
-                raffleUserNumbers.length * parseInt(raffle?.value as string)
-              ).toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
+              {convertNumberToCurrency(
+                raffleUserNumbers.length * Number(raffle?.value)
+              )}
             </h3>
           </div>
           {!!raffle && raffle.quantity && (
             <Progress
               value={
-                (100 *
-                  parseInt(raffle?.value as string) *
-                  raffleUserNumbers.length) /
-                (raffle.quantity * parseInt(raffle.value))
+                (100 * Number(raffle?.value) * raffleUserNumbers.length) /
+                (raffle.quantity * Number(raffle.value))
               }
               size="lg"
               className={cx(
@@ -393,12 +383,9 @@ ${Array.from(Array(raffle.quantity).keys())
                 !showMoneyProgress && "blur"
               )}
             >
-              {(
-                (raffle?.quantity || 1) * parseInt(raffle?.value as string)
-              ).toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
+              {convertNumberToCurrency(
+                (raffle?.quantity || 1) * Number(raffle?.value)
+              )}
             </h3>
           </div>
         </div>

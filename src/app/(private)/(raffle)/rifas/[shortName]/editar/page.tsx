@@ -31,6 +31,7 @@ import {
 import { db } from "@/configs/firebase";
 import { createRaffleSchema, updateRaffleUserSchema } from "@/schemas/raffle";
 import raffleService from "@/services/raffle";
+import { convertNumberToCurrency, maskValueToCurrency } from "@/utils/currency";
 
 interface EditRaffleProps {
   params: {
@@ -100,7 +101,7 @@ export default function EditRaffle({ params }: EditRaffleProps) {
         shortName: response.shortName,
         type: response.type,
         userId: response.userId,
-        value: response.value,
+        value: convertNumberToCurrency(response.value) as unknown as number,
         visibility: response.visibility,
       });
     } catch (error: any) {
@@ -248,6 +249,9 @@ export default function EditRaffle({ params }: EditRaffleProps) {
           <div>
             <Input
               {...registerRaffle("value")}
+              onChange={(e) => {
+                maskValueToCurrency(e);
+              }}
               error={!!errorsRaffle.value?.message}
               label="Valor por rifa"
               className="w-[200px]"

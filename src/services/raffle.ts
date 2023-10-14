@@ -9,6 +9,7 @@ import {
 import { IUser } from "@/@types/user.type";
 import { db } from "@/configs/firebase";
 import { ERRORS } from "@/constants";
+import { convertCurrencyToNumber } from "@/utils/currency";
 import { generateInviteCode } from "@/utils/raffle";
 import {
   DocumentData,
@@ -46,6 +47,7 @@ class RaffleService {
 
     await setDoc(raffleDoc, {
       ...data,
+      value: convertCurrencyToNumber(data.value as unknown as string),
       id: raffleDoc.id,
       createdAt: new Date(),
       isDeleted: false,
@@ -70,6 +72,7 @@ class RaffleService {
 
     await updateDoc(raffleDoc, {
       ...data,
+      value: convertCurrencyToNumber(data.value as unknown as string),
       updatedAt: new Date(),
       inviteUri: `${process.env.NEXT_PUBLIC_APP_URL}/rifas/${data.shortName}?cinvitation=${inviteCode}`,
       inviteCode,
