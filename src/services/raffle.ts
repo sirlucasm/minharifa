@@ -10,7 +10,7 @@ import { IUser } from "@/@types/user.type";
 import { db } from "@/configs/firebase";
 import { ERRORS } from "@/constants";
 import { convertCurrencyToNumber } from "@/utils/currency";
-import { generateInviteCode } from "@/utils/raffle";
+import { generateInviteCode } from "@/utils/invitation";
 import {
   DocumentData,
   and,

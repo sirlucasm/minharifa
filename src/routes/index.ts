@@ -17,8 +17,10 @@ const routes = {
       edit: (slug: string) => `/rifas/${slug}/editar`,
     },
 
-    events: {
+    event: {
       list: "/eventos",
+      create: "/eventos/criar",
+      show: (slug: string) => `/eventos/${slug}`,
     },
   },
 };

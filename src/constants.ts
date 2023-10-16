@@ -32,6 +32,13 @@ export const ERRORS = {
     code: "raffle/inviteAlreadySent",
     message: "Pedido de participação da Rifa já foi enviado",
   },
+
+  event: {
+    shortNameExists: {
+      code: "event/shortNameExists",
+      message: "O nome curto informado do evento já está em uso",
+    },
+  },
 };
 
 export const FIREBASE_ERRORS = {

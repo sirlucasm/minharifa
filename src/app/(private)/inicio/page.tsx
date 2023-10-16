@@ -23,7 +23,7 @@ export default function Home() {
             </span>
           </Link>
           <Link
-            href={routes.private.events.list}
+            href={routes.private.event.list}
             className="mt-4 bg-white shadow-md p-4 w-36 flex flex-col items-center rounded-xl hover:shadow-lg transition-shadow duration-300"
           >
             <Image src={CalendarIcon} alt="Calendar icon" className="w-8" />
