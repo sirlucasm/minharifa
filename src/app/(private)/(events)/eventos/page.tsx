@@ -12,6 +12,11 @@ import { IEvent } from "@/@types/event.type";
 import eventService from "@/services/event";
 import useAuth from "@/hooks/useAuth";
 import routes from "@/routes";
+import moment from "moment";
+
+import "moment/locale/pt-br";
+
+moment.locale("pt-br");
 
 export default function Events() {
   const { currentUser } = useAuth();
@@ -55,10 +60,16 @@ export default function Events() {
               <Link
                 key={event.id}
                 href={routes.private.event.show(event.shortName)}
-                className="bg-white rounded shadow-md py-3 px-6 w-full md:min-w-[210px] md:w-fit"
+                className="bg-white rounded-lg shadow-md py-3 px-6 w-full md:min-w-[210px] md:w-fit"
               >
                 <div className="self-start flex-wrap max-w-[210px]">
                   <h3 className="font-semibold text-gray-dark">{event.name}</h3>
+                </div>
+                <div>
+                  <span className="text-xs text-gray">
+                    começa{" "}
+                    {moment(event.startAt.toDate()).endOf("day").fromNow()}
+                  </span>
                 </div>
               </Link>
             ))

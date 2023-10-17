@@ -23,7 +23,7 @@ export const createRaffleSchema = yup.object({
 
     return schema;
   }),
-  value: yup.string().required("Você deve informar um nome"),
+  value: yup.string().required("Você deve informar um valor"),
 });
 
 export const createRaffleUserSchema = yup.object({
