@@ -66,10 +66,24 @@ export default function Events() {
                   <h3 className="font-semibold text-gray-dark">{event.name}</h3>
                 </div>
                 <div>
-                  <span className="text-xs text-gray">
-                    começa{" "}
-                    {moment(event.startAt.toDate()).endOf("day").fromNow()}
-                  </span>
+                  {moment().isBetween(
+                    moment(event.startAt.toDate()),
+                    moment(event.endAt.toDate())
+                  ) ? (
+                    <span className="text-xs text-success">
+                      Acontecendo agora
+                    </span>
+                  ) : <span className="text-xs text-gray">
+                      {moment(event.startAt.toDate()).isAfter()}
+                    </span> ? (
+                    <span className="text-xs text-gray">
+                      {moment(event.startAt.toDate()).endOf("day").fromNow()}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-gray">
+                      {moment(event.startAt.toDate()).startOf("day").fromNow()}
+                    </span>
+                  )}
                 </div>
               </Link>
             ))

@@ -38,6 +38,10 @@ export const ERRORS = {
       code: "event/shortNameExists",
       message: "O nome curto informado do evento já está em uso",
     },
+    notFound: {
+      code: "event/notFound",
+      message: "O Evento não foi encontrado",
+    },
   },
 };
 

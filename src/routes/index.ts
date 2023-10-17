@@ -21,6 +21,9 @@ const routes = {
       list: "/eventos",
       create: "/eventos/criar",
       show: (slug: string) => `/eventos/${slug}`,
+      requestInvite: (slug: string) => `/eventos/${slug}/solicitar-convite`,
+      acceptInvite: (slug: string) => `/eventos/${slug}/aceitar-convite`,
+      edit: (slug: string) => `/eventos/${slug}/editar`,
     },
   },
 };

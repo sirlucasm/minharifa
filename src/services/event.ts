@@ -5,10 +5,12 @@ import {
   and,
   collection,
   doc,
+  getDoc,
   getDocs,
   or,
   query,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { generateInviteCode } from "@/utils/invitation";
@@ -16,6 +18,7 @@ import { convertCurrencyToNumber } from "@/utils/currency";
 
 import { CreateEventDto, IEvent } from "@/@types/event.type";
 import { ERRORS } from "@/constants";
+import { IUser } from "@/@types/user.type";
 
 const eventRef = collection(db, "events");
 // const eventUsersRef = collection(db, "eventUsers");
@@ -57,8 +60,7 @@ class EventService {
           where("sharedUsers", "array-contains", userId),
           where("userId", "==", userId)
         ),
-        where("isDeleted", "==", false),
-        where("startAt", "<=", new Date())
+        where("isDeleted", "==", false)
       )
     );
 
@@ -70,6 +72,65 @@ class EventService {
     });
 
     return events as IEvent[];
+  };
+
+  get = async (shortName: string, userId: string) => {
+    const q = query(
+      eventRef,
+      and(
+        or(
+          where("sharedUsers", "array-contains", userId),
+          where("userId", "==", userId)
+        ),
+        where("shortName", "==", shortName),
+        where("isDeleted", "==", false)
+      )
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) throw ERRORS.event.notFound;
+
+    const event = querySnapshot.docs[0].data() as IEvent;
+
+    const participants: IUser[] = [];
+
+    if (event.sharedUsers) {
+      event.sharedUsers.forEach(async (userId) => {
+        const users = await getDoc(doc(db, "users", userId));
+        participants.push(users.data() as IUser);
+      });
+    }
+
+    event.participants = participants;
+
+    return event;
+  };
+
+  getByShortName = async (shortName: string) => {
+    const q = query(
+      eventRef,
+      where("shortName", "==", shortName),
+      where("isDeleted", "==", false)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) throw ERRORS.event.notFound;
+
+    const event = querySnapshot.docs[0].data();
+
+    return event as IEvent;
+  };
+
+  delete = async (eventId: string) => {
+    const raffleDoc = doc(eventRef, eventId);
+
+    await updateDoc(raffleDoc, {
+      isDeleted: true,
+      deletedAt: new Date(),
+      updatedAt: new Date(),
+    });
   };
 }
 
