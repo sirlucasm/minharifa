@@ -6,7 +6,6 @@ interface MetadataProps {
   params: {
     shortName: string;
   };
-  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export async function generateMetadata({
