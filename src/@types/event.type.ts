@@ -36,3 +36,23 @@ export interface CreateEventDto {
   startAt: Timestamp;
   endAt: Timestamp;
 }
+
+export interface IEventBudget {
+  id: string;
+  name: string;
+  value: number;
+  userId: string;
+  eventId: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  deletedAt: Timestamp;
+  isDeleted: boolean;
+}
+
+export interface CreateEventBudgetDto {
+  name: string;
+  value: number;
+  userId: string;
+  eventId: string;
+  isDeleted: boolean;
+}

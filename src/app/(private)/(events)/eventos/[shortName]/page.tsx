@@ -6,32 +6,46 @@ import Image from "next/image";
 
 import { Wrapper } from "@/components/common/Wrapper";
 import {
-  Badge,
   Breadcrumbs,
   Dialog,
   DialogBody,
   DialogFooter,
   DialogHeader,
   IconButton,
+  List,
+  ListItem,
+  ListItemSuffix,
   Menu,
   MenuHandler,
   MenuItem,
   MenuList,
   Progress,
   Spinner,
-  Tooltip,
 } from "@material-tailwind/react";
 import Button from "@/components/common/Button";
 
 import MenuDotHorizontalIcon from "@/assets/icons/menu-dot-horizontal.svg?url";
+import PlusIcon from "@/assets/icons/plus.svg?url";
+import PencilIcon from "@/assets/icons/pencil.svg?url";
 
 import routes from "@/routes";
 import eventService from "@/services/event";
 import useAuth from "@/hooks/useAuth";
-import { IEvent } from "@/@types/event.type";
+import { IEvent, IEventBudget } from "@/@types/event.type";
 import { message } from "antd";
 import { convertNumberToCurrency } from "@/utils/currency";
 import moment from "moment";
+import {
+  DocumentData,
+  collection,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "@/configs/firebase";
+import CreateEventBudgetModal from "./components/CreateEventBudgetModal";
+import cx from "classix";
+import { getStorage, setStorage } from "@/utils/storage";
 
 interface ShowEventProps {
   params: {
@@ -53,9 +67,23 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
 
   const [showConfirmEventDeleteDialog, setShowConfirmEventDeleteDialog] =
     useState(false);
+  const [showCreateEventBudgetModal, setShowCreateEventBudgetModal] =
+    useState(false);
+  const [showMoneyProgress, setShowMoneyProgress] = useState(
+    useMemo(() => {
+      const moneyProgress = getStorage("show_money_progress");
+      return moneyProgress !== undefined ? (moneyProgress as boolean) : true;
+    }, [])
+  );
   const [event, setEvent] = useState<IEvent | undefined>();
+  const [eventBudgets, setEventBudgets] = useState<IEventBudget[]>([]);
   const [isLoadingEvent, setIsLoadingEvent] = useState(false);
   const [isLoadingDeleteEvent, setIsLoadingDeleteEvent] = useState(false);
+
+  const budgetTotalValue = useMemo(
+    () => eventBudgets.reduce((acc, curr) => curr.value + acc, 0),
+    [eventBudgets]
+  );
 
   const fetchEvent = useCallback(async () => {
     if (!currentUser) return;
@@ -71,13 +99,13 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
     }
   }, [currentUser, shortName, router]);
 
-  const handleDeleteRaffle = useCallback(async () => {
+  const handleDeleteEvent = useCallback(async () => {
     if (!event) return;
     setIsLoadingDeleteEvent(true);
     try {
       await eventService.delete(event.id);
       message.success("A Rifa foi excluída com sucesso");
-      router.replace(routes.private.raffle.list);
+      router.replace(routes.private.event.list);
     } catch (error: any) {
       message.error(error.message);
     } finally {
@@ -88,6 +116,32 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
   const handleOpenConfirmEventDeleteDialog = useCallback(() => {
     setShowConfirmEventDeleteDialog(!showConfirmEventDeleteDialog);
   }, [showConfirmEventDeleteDialog, setShowConfirmEventDeleteDialog]);
+
+  const handleOpenCreateEventBudgetModal = useCallback(() => {
+    setShowCreateEventBudgetModal(!showCreateEventBudgetModal);
+  }, [showCreateEventBudgetModal, setShowCreateEventBudgetModal]);
+
+  const handleHideMoneyProgress = useCallback(() => {
+    setShowMoneyProgress((prev: boolean) => !prev);
+    setStorage("show_money_progress", !showMoneyProgress);
+  }, [showMoneyProgress]);
+
+  useEffect(() => {
+    if (!event) return;
+    const eventBudgetsRef = collection(db, "eventBudgets");
+    const q = query(
+      eventBudgetsRef,
+      where("eventId", "==", event.id),
+      where("isDeleted", "==", false)
+    );
+    const unsub = onSnapshot(q, (snapshot) => {
+      const budgets: DocumentData[] = [];
+      snapshot.forEach(async (response) => budgets.push(response.data()));
+      setEventBudgets(budgets as IEventBudget[]);
+    });
+
+    return () => unsub();
+  }, [event]);
 
   useEffect(() => {
     fetchEvent();
@@ -107,6 +161,7 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
         </Breadcrumbs>
 
         <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 relative">
+          {isLoadingEvent && <Spinner className="w-5" />}
           <div>
             <h3 className="text-xl font-semibold text-gray-dark">
               {event?.name}
@@ -120,22 +175,24 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
               moment(event?.endAt.toDate())
             ) ? (
               <span className="text-sm text-success">Acontecendo agora</span>
-            ) : moment(event?.startAt.toDate()).isBefore() ? (
-              <span className="text-sm text-gray">
-                Aconteceu em{" "}
-                {moment(event?.startAt.toDate()).format("DD/MM/YYYY")} às{" "}
-                {moment(event?.startAt.toDate()).format("HH:mm")}
-              </span>
             ) : (
-              <span className="text-sm text-gray">
-                Começa {moment(event?.startAt.toDate()).format("DD/MM/YYYY")} às{" "}
-                {moment(event?.startAt.toDate()).format("HH:mm")}
-              </span>
+              <>
+                <span className="text-sm text-gray">
+                  {moment(event?.startAt.toDate()).isBefore()
+                    ? "Aconteceu em "
+                    : "Começa "}
+                  {moment(event?.startAt.toDate()).format("DD/MM/YYYY")} às{" "}
+                  {moment(event?.startAt.toDate()).format("HH:mm")}
+                </span>
+                <span className="text-sm text-gray">
+                  {moment(event?.startAt.toDate()).isBefore()
+                    ? "Terminou em "
+                    : "Termina "}
+                  {moment(event?.endAt.toDate()).format("DD/MM/YYYY")} às{" "}
+                  {moment(event?.endAt.toDate()).format("HH:mm")}
+                </span>
+              </>
             )}
-            <span className="text-sm text-gray">
-              Termina {moment(event?.endAt.toDate()).format("DD/MM/YYYY")} às{" "}
-              {moment(event?.endAt.toDate()).format("HH:mm")}
-            </span>
           </div>
           <Menu>
             <MenuHandler>
@@ -164,10 +221,84 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
           </Menu>
         </div>
 
-        <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 flex flex-col items-center sm:flex-row gap-2 sm:gap-6">
-          <div>
+        <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 flex flex-col gap-2">
+          <div className="flex flex-row items-center gap-2">
             <h3 className="text-lg text-gray-dark max-w-sm">Orçamento</h3>
+            <IconButton
+              className=""
+              variant="text"
+              onClick={handleOpenCreateEventBudgetModal}
+            >
+              <Image src={PlusIcon} alt="Plus icon" className="w-12" />
+            </IconButton>
           </div>
+          {!!eventBudgets.length && (
+            <List className="p-0">
+              {eventBudgets.map((budget) => (
+                <ListItem
+                  ripple={false}
+                  className="py-1 pr-1 pl-4"
+                  key={budget.id}
+                >
+                  <div className="flex flex-col">
+                    <h3 className="text-gray font-semibold text-md">
+                      {budget.name}
+                    </h3>
+                    <span
+                      className={cx(
+                        "text-gray text-sm",
+                        !showMoneyProgress && "blur-[2.3px]"
+                      )}
+                    >
+                      {convertNumberToCurrency(budget.value)}
+                    </span>
+                  </div>
+                  <ListItemSuffix>
+                    <IconButton className="" variant="text">
+                      <Image
+                        src={PencilIcon}
+                        alt="Pencil icon"
+                        className="w-12"
+                      />
+                    </IconButton>
+                  </ListItemSuffix>
+                </ListItem>
+              ))}
+              <div
+                className="flex flex-col items-center xs:flex-row mt-5 gap-2 xs:gap-5"
+                onClick={handleHideMoneyProgress}
+              >
+                <div>
+                  <h3
+                    className={cx(
+                      "text-md text-gray cursor-pointer",
+                      !showMoneyProgress && "blur-[3px]"
+                    )}
+                  >
+                    {convertNumberToCurrency(budgetTotalValue)}
+                  </h3>
+                </div>
+                <Progress
+                  value={(100 * budgetTotalValue) / Number(event?.budgetValue)}
+                  size="lg"
+                  className={cx(
+                    "[&>div]:bg-primary",
+                    !showMoneyProgress && "blur-[3px]"
+                  )}
+                />
+                <div>
+                  <h3
+                    className={cx(
+                      "text-md text-gray cursor-pointer",
+                      !showMoneyProgress && "blur-[3px]"
+                    )}
+                  >
+                    {convertNumberToCurrency(event?.budgetValue)}
+                  </h3>
+                </div>
+              </div>
+            </List>
+          )}
         </div>
       </div>
 
@@ -192,12 +323,17 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
           <Button
             colorVariant="outlined"
             isLoading={isLoadingDeleteEvent}
-            onClick={handleDeleteRaffle}
+            onClick={handleDeleteEvent}
           >
             Sim
           </Button>
         </DialogFooter>
       </Dialog>
+      <CreateEventBudgetModal
+        open={showCreateEventBudgetModal}
+        handler={handleOpenCreateEventBudgetModal}
+        event={event}
+      />
     </Wrapper>
   );
 }

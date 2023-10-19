@@ -16,13 +16,18 @@ import {
 import { generateInviteCode } from "@/utils/invitation";
 import { convertCurrencyToNumber } from "@/utils/currency";
 
-import { CreateEventDto, IEvent } from "@/@types/event.type";
+import {
+  CreateEventBudgetDto,
+  CreateEventDto,
+  IEvent,
+} from "@/@types/event.type";
 import { ERRORS } from "@/constants";
 import { IUser } from "@/@types/user.type";
 
 const eventRef = collection(db, "events");
 // const eventUsersRef = collection(db, "eventUsers");
 // const eventInvitationsRef = collection(db, "eventInvitations");
+const eventBudgetsRef = collection(db, "eventBudgets");
 
 class EventService {
   create = async (data: CreateEventDto) => {
@@ -130,6 +135,18 @@ class EventService {
       isDeleted: true,
       deletedAt: new Date(),
       updatedAt: new Date(),
+    });
+  };
+
+  createEventBudget = async (data: CreateEventBudgetDto) => {
+    const eventBudgetDoc = doc(eventBudgetsRef);
+
+    await setDoc(eventBudgetDoc, {
+      ...data,
+      id: eventBudgetDoc.id,
+      value: convertCurrencyToNumber(data.value as unknown as string),
+      createdAt: new Date(),
+      isDeleted: false,
     });
   };
 }

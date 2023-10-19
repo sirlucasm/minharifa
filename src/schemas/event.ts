@@ -28,3 +28,8 @@ export const createEventSchema = yup.object({
     return schema.required("Você deve informar a data de término");
   }),
 });
+
+export const createEventBudgetSchema = yup.object({
+  name: yup.string().required("Você deve informar um nome"),
+  value: yup.string().required("Você deve informar o valor do orçamento"),
+});
