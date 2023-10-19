@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Wrapper } from "@/components/common/Wrapper";
 import Input from "@/components/common/Input";
 import Select from "@/components/common/Select";
-import { Option } from "@material-tailwind/react";
+import { Breadcrumbs, Option } from "@material-tailwind/react";
 import Textarea from "@/components/common/Textarea";
 import Button from "@/components/common/Button";
 import { message } from "antd";
@@ -18,6 +18,7 @@ import { CreateEventDto, IEventVisibility } from "@/@types/event.type";
 import { maskValueToCurrency } from "@/utils/currency";
 import useAuth from "@/hooks/useAuth";
 import eventService from "@/services/event";
+import Link from "next/link";
 
 export default function CreateEvent() {
   const router = useRouter();
@@ -55,7 +56,16 @@ export default function CreateEvent() {
   );
 
   return (
-    <Wrapper>
+    <Wrapper className="mt-3">
+      <Breadcrumbs>
+        <Link href={routes.private.home} className="opacity-60">
+          Inicio
+        </Link>
+        <Link href={routes.private.event.list} className="opacity-60">
+          Eventos
+        </Link>
+        <Link href={routes.private.event.create}>Criar Evento</Link>
+      </Breadcrumbs>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-3 items-center w-full md:w-[480px] mt-5 bg-white shadow-md py-6 px-8 rounded-xl"
@@ -164,7 +174,7 @@ export default function CreateEvent() {
             <Input
               {...register("endAt")}
               error={!!errors.endAt?.message}
-              label="Inicia em"
+              label="Termina em"
               type="datetime-local"
             />
             {errors.endAt && (

@@ -1,11 +1,12 @@
 "use client";
 import { useState, useCallback } from "react";
+import Link from "next/link";
 
 import Button from "@/components/common/Button";
 import Input from "@/components/common/Input";
 import Select from "@/components/common/Select";
 import { Wrapper } from "@/components/common/Wrapper";
-import { Option } from "@material-tailwind/react";
+import { Breadcrumbs, Option } from "@material-tailwind/react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import useYupValidationResolver from "@/hooks/useYupValidationResolver";
 import { createRaffleSchema } from "@/schemas/raffle";
@@ -62,6 +63,15 @@ export default function CreateRaffle() {
 
   return (
     <Wrapper className="mt-3">
+      <Breadcrumbs>
+        <Link href={routes.private.home} className="opacity-60">
+          Inicio
+        </Link>
+        <Link href={routes.private.raffle.list} className="opacity-60">
+          Rifas
+        </Link>
+        <Link href={routes.private.raffle.create}>Criar Rifa</Link>
+      </Breadcrumbs>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-3 items-center w-full md:w-[480px] mt-5 bg-white shadow-md py-6 px-8 rounded-xl"
