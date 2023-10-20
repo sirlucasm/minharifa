@@ -56,3 +56,10 @@ export interface CreateEventBudgetDto {
   eventId: string;
   isDeleted: boolean;
 }
+
+export interface UpdateEventBudgetDto {
+  name?: string;
+  value?: number;
+  userId: string;
+  eventId: string;
+}
