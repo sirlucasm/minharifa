@@ -43,7 +43,7 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "@/configs/firebase";
-import CreateEventBudgetModal from "./components/CreateEventBudgetModal";
+import CreateOrEditEventBudgetModal from "./components/CreateOrEditEventBudgetModal";
 import cx from "classix";
 import { getStorage, setStorage } from "@/utils/storage";
 
@@ -77,6 +77,9 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
   );
   const [event, setEvent] = useState<IEvent | undefined>();
   const [eventBudgets, setEventBudgets] = useState<IEventBudget[]>([]);
+  const [selectedEventBudget, setSelectedEventBudget] = useState<
+    IEventBudget | undefined
+  >();
   const [isLoadingEvent, setIsLoadingEvent] = useState(false);
   const [isLoadingDeleteEvent, setIsLoadingDeleteEvent] = useState(false);
 
@@ -254,7 +257,14 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
                     </span>
                   </div>
                   <ListItemSuffix>
-                    <IconButton className="" variant="text">
+                    <IconButton
+                      className=""
+                      variant="text"
+                      onClick={() => {
+                        handleOpenCreateEventBudgetModal();
+                        setSelectedEventBudget(budget);
+                      }}
+                    >
                       <Image
                         src={PencilIcon}
                         alt="Pencil icon"
@@ -329,10 +339,12 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
           </Button>
         </DialogFooter>
       </Dialog>
-      <CreateEventBudgetModal
+      <CreateOrEditEventBudgetModal
         open={showCreateEventBudgetModal}
         handler={handleOpenCreateEventBudgetModal}
         event={event}
+        eventBudget={selectedEventBudget}
+        setSelectedEventBudget={setSelectedEventBudget}
       />
     </Wrapper>
   );

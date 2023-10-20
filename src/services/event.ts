@@ -20,6 +20,7 @@ import {
   CreateEventBudgetDto,
   CreateEventDto,
   IEvent,
+  UpdateEventBudgetDto,
 } from "@/@types/event.type";
 import { ERRORS } from "@/constants";
 import { IUser } from "@/@types/user.type";
@@ -147,6 +148,27 @@ class EventService {
       value: convertCurrencyToNumber(data.value as unknown as string),
       createdAt: new Date(),
       isDeleted: false,
+    });
+  };
+
+  updateEventBudget = async (budgetId: string, data: UpdateEventBudgetDto) => {
+    const q = query(
+      eventBudgetsRef,
+      where("id", "==", budgetId),
+      where("eventId", "==", data.eventId),
+      where("isDeleted", "==", false)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) throw ERRORS.eventBudget.notFound;
+
+    const eventBudgetDoc = querySnapshot.docs[0].ref;
+
+    await updateDoc(eventBudgetDoc, {
+      ...data,
+      value: convertCurrencyToNumber(data.value as unknown as string),
+      updatedAt: new Date(),
     });
   };
 }

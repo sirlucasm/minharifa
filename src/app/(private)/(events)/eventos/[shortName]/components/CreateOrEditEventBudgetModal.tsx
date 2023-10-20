@@ -1,4 +1,10 @@
-import { useCallback, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import Image from "next/image";
 
 import {
@@ -9,27 +15,35 @@ import {
 } from "@material-tailwind/react";
 import { message } from "antd";
 import Input from "@/components/common/Input";
+import Button from "@/components/common/Button";
 
 import CloseIcon from "@/assets/icons/close.svg?url";
 
-import { CreateEventBudgetDto, IEvent } from "@/@types/event.type";
+import {
+  CreateEventBudgetDto,
+  IEvent,
+  IEventBudget,
+} from "@/@types/event.type";
 import { SubmitHandler, useForm } from "react-hook-form";
 import useYupValidationResolver from "@/hooks/useYupValidationResolver";
 import { createEventBudgetSchema } from "@/schemas/event";
 import eventService from "@/services/event";
-import { maskValueToCurrency } from "@/utils/currency";
-import Button from "@/components/common/Button";
+import { convertNumberToCurrency, maskValueToCurrency } from "@/utils/currency";
 
 interface InvitesModalProps {
   open: boolean;
   handler: () => void;
   event: IEvent | undefined;
+  eventBudget?: IEventBudget;
+  setSelectedEventBudget: Dispatch<SetStateAction<IEventBudget | undefined>>;
 }
 
 export default function CreateEventBudgetModal({
   open,
   handler,
   event,
+  eventBudget,
+  setSelectedEventBudget,
 }: InvitesModalProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,13 +51,36 @@ export default function CreateEventBudgetModal({
     handleSubmit,
     register,
     formState: { errors },
+    reset,
   } = useForm<CreateEventBudgetDto>({
     resolver: useYupValidationResolver(createEventBudgetSchema),
     mode: "onChange",
   });
 
-  const onSubmit: SubmitHandler<CreateEventBudgetDto> = useCallback(
-    async (data) => {
+  const handleUpdateEventBudget = useCallback(
+    async (data: CreateEventBudgetDto) => {
+      if (!event || !eventBudget) return;
+      setIsLoading(true);
+      try {
+        await eventService.updateEventBudget(eventBudget?.id, {
+          ...data,
+          eventId: event.id,
+          userId: event.userId,
+        });
+        message.success("Orçamento editado com sucesso");
+        handler();
+        setSelectedEventBudget(undefined);
+      } catch (error: any) {
+        message.error(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [event, eventBudget, handler, setSelectedEventBudget]
+  );
+
+  const handleCreateEventBudget = useCallback(
+    async (data: CreateEventBudgetDto) => {
       if (!event) return;
       setIsLoading(true);
       try {
@@ -63,11 +100,31 @@ export default function CreateEventBudgetModal({
     [event, handler]
   );
 
+  const onSubmit: SubmitHandler<CreateEventBudgetDto> = useCallback(
+    async (data) => {
+      if (eventBudget) {
+        return await handleUpdateEventBudget(data);
+      }
+      await handleCreateEventBudget(data);
+    },
+    [eventBudget, handleCreateEventBudget, handleUpdateEventBudget]
+  );
+
+  useEffect(() => {
+    if (!eventBudget) return;
+    reset({
+      name: eventBudget.name,
+      value: convertNumberToCurrency(eventBudget.value) as unknown as number,
+      eventId: eventBudget.eventId,
+      userId: eventBudget.userId,
+    });
+  }, [eventBudget, reset]);
+
   return (
     <Dialog open={open} handler={handler} size="xs">
       <DialogHeader className="justify-between">
         <h1 className="text-xl font-semibold text-gray-dark">
-          Criar orçamento
+          {eventBudget ? "Editar" : "Criar"} orçamento
         </h1>
         <IconButton
           color="blue-gray"
@@ -109,7 +166,7 @@ export default function CreateEventBudgetModal({
             )}
           </div>
           <Button className="self-start" type="submit" isLoading={isLoading}>
-            Criar minha rifa
+            {eventBudget ? "Salvar" : "Criar"}
           </Button>
         </form>
       </DialogBody>
