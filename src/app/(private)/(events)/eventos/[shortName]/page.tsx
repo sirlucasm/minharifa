@@ -27,6 +27,7 @@ import Button from "@/components/common/Button";
 import MenuDotHorizontalIcon from "@/assets/icons/menu-dot-horizontal.svg?url";
 import PlusIcon from "@/assets/icons/plus.svg?url";
 import PencilIcon from "@/assets/icons/pencil.svg?url";
+import GroupPeopleIcon from "@/assets/icons/group-people.svg?url";
 
 import routes from "@/routes";
 import eventService from "@/services/event";
@@ -151,173 +152,212 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
   }, [fetchEvent]);
 
   return (
-    <Wrapper className="flex mt-5 flex-col lg:flex-row gap-4 mb-10 w-full">
-      <div className="w-full">
-        <Breadcrumbs>
-          <Link href={routes.private.home} className="opacity-60">
-            Inicio
-          </Link>
-          <Link href={routes.private.event.list} className="opacity-60">
-            Eventos
-          </Link>
-          <Link href={routes.private.event.show(shortName)}>{shortName}</Link>
-        </Breadcrumbs>
-
-        <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 relative">
-          {isLoadingEvent && <Spinner className="w-5" />}
-          <div>
-            <h3 className="text-xl font-semibold text-gray-dark">
-              {event?.name}
-            </h3>
-            <p className="text-sm text-gray italic">/{event?.shortName}</p>
-            <p className="text-sm text-gray my-2.5">{event?.description}</p>
-          </div>
-          <div className="flex flex-col">
-            {moment().isBetween(
-              moment(event?.startAt.toDate()),
-              moment(event?.endAt.toDate())
-            ) ? (
-              <span className="text-sm text-success">Acontecendo agora</span>
-            ) : (
-              <>
-                <span className="text-sm text-gray">
-                  {moment(event?.startAt.toDate()).isBefore()
-                    ? "Aconteceu em "
-                    : "Começa "}
-                  {moment(event?.startAt.toDate()).format("DD/MM/YYYY")} às{" "}
-                  {moment(event?.startAt.toDate()).format("HH:mm")}
-                </span>
-                <span className="text-sm text-gray">
-                  {moment(event?.startAt.toDate()).isBefore()
-                    ? "Terminou em "
-                    : "Termina "}
-                  {moment(event?.endAt.toDate()).format("DD/MM/YYYY")} às{" "}
-                  {moment(event?.endAt.toDate()).format("HH:mm")}
-                </span>
-              </>
-            )}
-          </div>
-          <Menu>
-            <MenuHandler>
-              <IconButton className="!absolute right-2 top-3" variant="text">
-                <Image
-                  src={MenuDotHorizontalIcon}
-                  alt="MenuDotHorizontal icon"
-                  className="w-12"
-                />
-              </IconButton>
-            </MenuHandler>
-            <MenuList>
-              <Link
-                href={routes.private.event.edit(shortName)}
-                className="outline-none hover:!outline-none"
-              >
-                <MenuItem>Editar</MenuItem>
-              </Link>
-              <MenuItem
-                onClick={handleOpenConfirmEventDeleteDialog}
-                className="outline-none text-danger hover:!text-danger hover:!outline-none"
-              >
-                Excluir
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </div>
-
-        <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 flex flex-col gap-2">
-          <div className="flex flex-row items-center gap-2">
-            <h3 className="text-lg text-gray-dark max-w-sm">Orçamento</h3>
-            <IconButton
-              className=""
-              variant="text"
-              onClick={handleOpenCreateEventBudgetModal}
-            >
-              <Image src={PlusIcon} alt="Plus icon" className="w-12" />
-            </IconButton>
-          </div>
-          {!!eventBudgets.length && (
-            <List className="p-0">
-              {eventBudgets.map((budget) => (
-                <ListItem
-                  ripple={false}
-                  className="py-1 pr-1 pl-4"
-                  key={budget.id}
-                >
-                  <div className="flex flex-col">
-                    <h3 className="text-gray font-semibold text-md">
-                      {budget.name}
-                    </h3>
-                    <span
-                      className={cx(
-                        "text-gray text-sm",
-                        !showMoneyProgress && "blur-[2.3px]"
-                      )}
-                    >
-                      {convertNumberToCurrency(budget.value)}
+    <Wrapper className=" mt-5  mb-10 w-full">
+      <Breadcrumbs>
+        <Link href={routes.private.home} className="opacity-60">
+          Inicio
+        </Link>
+        <Link href={routes.private.event.list} className="opacity-60">
+          Eventos
+        </Link>
+        <Link href={routes.private.event.show(shortName)}>{shortName}</Link>
+      </Breadcrumbs>
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="w-full">
+          {isLoadingEvent || !event ? (
+            <Spinner className="w-5" />
+          ) : (
+            <>
+              <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 relative">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-dark">
+                    {event?.name}
+                  </h3>
+                  <p className="text-sm text-gray italic">
+                    /{event?.shortName}
+                  </p>
+                  <p className="text-sm text-gray my-2.5">
+                    {event?.description}
+                  </p>
+                </div>
+                <div className="flex flex-col">
+                  {moment().isBetween(
+                    moment(event?.startAt.toDate()),
+                    moment(event?.endAt.toDate())
+                  ) ? (
+                    <span className="text-sm text-success">
+                      Acontecendo agora
                     </span>
-                  </div>
-                  <ListItemSuffix>
+                  ) : (
+                    <>
+                      <span className="text-sm text-gray">
+                        {moment(event?.startAt.toDate()).isBefore()
+                          ? "Aconteceu em "
+                          : "Começa "}
+                        {moment(event?.startAt.toDate()).format("DD/MM/YYYY")}{" "}
+                        às {moment(event?.startAt.toDate()).format("HH:mm")}
+                      </span>
+                      <span className="text-sm text-gray">
+                        {moment(event?.startAt.toDate()).isBefore()
+                          ? "Terminou em "
+                          : "Termina "}
+                        {moment(event?.endAt.toDate()).format("DD/MM/YYYY")} às{" "}
+                        {moment(event?.endAt.toDate()).format("HH:mm")}
+                      </span>
+                    </>
+                  )}
+                </div>
+                <Menu>
+                  <MenuHandler>
                     <IconButton
-                      className=""
+                      className="!absolute right-2 top-3"
                       variant="text"
-                      onClick={() => {
-                        handleOpenCreateEventBudgetModal();
-                        setSelectedEventBudget(budget);
-                      }}
                     >
                       <Image
-                        src={PencilIcon}
-                        alt="Pencil icon"
+                        src={MenuDotHorizontalIcon}
+                        alt="MenuDotHorizontal icon"
                         className="w-12"
                       />
                     </IconButton>
-                  </ListItemSuffix>
-                </ListItem>
-              ))}
-              <div
-                className="flex flex-col items-center xs:flex-row mt-5 gap-2 xs:gap-5"
-                onClick={handleHideMoneyProgress}
-              >
-                <div>
-                  <h3
-                    className={cx(
-                      "text-md text-gray cursor-pointer",
-                      !showMoneyProgress && "blur-[3px]"
-                    )}
-                  >
-                    {convertNumberToCurrency(budgetTotalValue)}
-                  </h3>
-                </div>
-                <Progress
-                  value={(100 * budgetTotalValue) / Number(event?.budgetValue)}
-                  size="lg"
-                  className={cx(
-                    "[&>div]:bg-primary",
-                    !showMoneyProgress && "blur-[3px]"
-                  )}
-                />
-                <div>
-                  <h3
-                    className={cx(
-                      "text-md text-gray cursor-pointer",
-                      !showMoneyProgress && "blur-[3px]"
-                    )}
-                  >
-                    {convertNumberToCurrency(event?.budgetValue)}
-                  </h3>
-                </div>
+                  </MenuHandler>
+                  <MenuList>
+                    <Link
+                      href={routes.private.event.edit(shortName)}
+                      className="outline-none hover:!outline-none"
+                    >
+                      <MenuItem>Editar</MenuItem>
+                    </Link>
+                    <MenuItem
+                      onClick={handleOpenConfirmEventDeleteDialog}
+                      className="outline-none text-danger hover:!text-danger hover:!outline-none"
+                    >
+                      Excluir
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
               </div>
-            </List>
+
+              <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 flex flex-col gap-2">
+                <div className="flex flex-row items-center gap-2">
+                  <h3 className="text-lg text-gray-dark max-w-sm">Orçamento</h3>
+                  <IconButton
+                    className=""
+                    variant="text"
+                    onClick={handleOpenCreateEventBudgetModal}
+                  >
+                    <Image src={PlusIcon} alt="Plus icon" className="w-12" />
+                  </IconButton>
+                </div>
+                {!!eventBudgets.length && (
+                  <List className="p-0">
+                    {eventBudgets.map((budget) => (
+                      <ListItem
+                        ripple={false}
+                        className="py-1 pr-1 pl-4"
+                        key={budget.id}
+                      >
+                        <div className="flex flex-col">
+                          <h3 className="text-gray font-semibold text-md">
+                            {budget.name}
+                          </h3>
+                          <span
+                            className={cx(
+                              "text-gray text-sm",
+                              !showMoneyProgress && "blur-[2.3px]"
+                            )}
+                          >
+                            {convertNumberToCurrency(budget.value)}
+                          </span>
+                        </div>
+                        <ListItemSuffix>
+                          <IconButton
+                            className=""
+                            variant="text"
+                            onClick={() => {
+                              handleOpenCreateEventBudgetModal();
+                              setSelectedEventBudget(budget);
+                            }}
+                          >
+                            <Image
+                              src={PencilIcon}
+                              alt="Pencil icon"
+                              className="w-12"
+                            />
+                          </IconButton>
+                        </ListItemSuffix>
+                      </ListItem>
+                    ))}
+                    <div
+                      className="flex flex-col items-center xs:flex-row mt-5 gap-2 xs:gap-5"
+                      onClick={handleHideMoneyProgress}
+                    >
+                      <div>
+                        <h3
+                          className={cx(
+                            "text-md text-gray cursor-pointer",
+                            !showMoneyProgress && "blur-[3px]"
+                          )}
+                        >
+                          {convertNumberToCurrency(budgetTotalValue)}
+                        </h3>
+                      </div>
+                      <Progress
+                        value={
+                          (100 * budgetTotalValue) / Number(event?.budgetValue)
+                        }
+                        size="lg"
+                        className={cx(
+                          "[&>div]:bg-primary",
+                          !showMoneyProgress && "blur-[3px]"
+                        )}
+                      />
+                      <div>
+                        <h3
+                          className={cx(
+                            "text-md text-gray cursor-pointer",
+                            !showMoneyProgress && "blur-[3px]"
+                          )}
+                        >
+                          {convertNumberToCurrency(event?.budgetValue)}
+                        </h3>
+                      </div>
+                    </div>
+                  </List>
+                )}
+              </div>
+            </>
           )}
         </div>
-      </div>
 
-      <div className="mt-5 lg:mt-14 w-full">
-        <div className=" bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6 h-60 xs:h-52">
-          <div>
-            <h3 className="text-lg text-gray-dark max-w-sm">
-              Lista de convidados
-            </h3>
+        <div className="mt-5 w-full">
+          <div className=" bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6">
+            <div>
+              <h3 className="text-lg text-gray-dark max-w-sm">Convidados</h3>
+            </div>
+            <div className="mt-3 flex overflow-x-auto gap-2 p-3">
+              <Link
+                href={routes.private.eventGuests.create(event?.id || "")}
+                className="bg-white shadow-md p-2 w-32 flex flex-col items-center rounded-xl hover:shadow-lg transition-shadow duration-300"
+              >
+                <Image src={PlusIcon} alt="Plus icon" className="w-7" />
+                <span className="text-sm text-gray font-semibold text-center">
+                  Adicionar
+                </span>
+              </Link>
+              <Link
+                href={routes.private.eventGuests.create(event?.id || "")}
+                className="bg-white shadow-md p-2 w-32 flex flex-col items-center rounded-xl hover:shadow-lg transition-shadow duration-300"
+              >
+                <Image
+                  src={GroupPeopleIcon}
+                  alt="Group People icon"
+                  className="w-7"
+                />
+                <span className="text-sm text-gray font-semibold text-center">
+                  Listar
+                </span>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
