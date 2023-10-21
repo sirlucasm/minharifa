@@ -101,7 +101,8 @@ export default function CreateEventBudgetModal({
   );
 
   const onSubmit: SubmitHandler<CreateEventBudgetDto> = useCallback(
-    async (data) => {
+    async (data, e) => {
+      e?.preventDefault();
       if (eventBudget) {
         return await handleUpdateEventBudget(data);
       }

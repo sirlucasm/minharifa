@@ -26,8 +26,10 @@ const routes = {
       edit: (slug: string) => `/eventos/${slug}/editar`,
     },
     eventGuests: {
-      list: (eventId: string) => `/eventos/${eventId}/convidados`,
-      create: (eventId: string) => `/eventos/${eventId}/convidados/criar`,
+      list: (shortName: string, eventId: string) =>
+        `/eventos/${shortName}/${eventId}/convidados`,
+      create: (shortName: string, eventId: string) =>
+        `/eventos/${shortName}/${eventId}/convidados/adicionar`,
     },
   },
 };

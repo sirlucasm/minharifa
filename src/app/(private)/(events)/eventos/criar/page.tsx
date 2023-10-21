@@ -36,7 +36,8 @@ export default function CreateEvent() {
   });
 
   const onSubmit: SubmitHandler<CreateEventDto> = useCallback(
-    async (data) => {
+    async (data, e) => {
+      e?.preventDefault();
       setIsLoading(true);
       try {
         if (!currentUser) return;

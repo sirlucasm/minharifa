@@ -41,7 +41,8 @@ export default function CreateRaffle() {
   const values = watch();
 
   const onSubmit: SubmitHandler<CreateRaffleDto> = useCallback(
-    async (data) => {
+    async (data, e) => {
+      e?.preventDefault();
       setIsLoading(true);
       try {
         if (!currentUser) return;

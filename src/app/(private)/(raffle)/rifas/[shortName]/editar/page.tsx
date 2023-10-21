@@ -113,7 +113,8 @@ export default function EditRaffle({ params }: EditRaffleProps) {
   }, [currentUser, shortName, resetRaffle, router]);
 
   const onSubmitRaffle: SubmitHandler<UpdateRaffleDto> = useCallback(
-    async (data) => {
+    async (data, e) => {
+      e?.preventDefault();
       setIsLoadingSaveRaffle(true);
       if (!raffle) return;
       if (values.quantity && values.quantity < biggestRaffleUserNumber) {
@@ -140,7 +141,8 @@ export default function EditRaffle({ params }: EditRaffleProps) {
   );
 
   const onSubmitRaffleUser: SubmitHandler<UpdateRaffleUserDto> = useCallback(
-    async (data) => {
+    async (data, e) => {
+      e?.preventDefault();
       setIsLoadingSaveRaffleUser(true);
       if (!raffle) return;
       try {

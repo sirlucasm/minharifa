@@ -152,7 +152,7 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
   }, [fetchEvent]);
 
   return (
-    <Wrapper className=" mt-5  mb-10 w-full">
+    <Wrapper className="mt-5 mb-10 w-full">
       <Breadcrumbs>
         <Link href={routes.private.home} className="opacity-60">
           Inicio
@@ -163,11 +163,11 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
         <Link href={routes.private.event.show(shortName)}>{shortName}</Link>
       </Breadcrumbs>
       <div className="flex flex-col lg:flex-row gap-4">
-        <div className="w-full">
-          {isLoadingEvent || !event ? (
-            <Spinner className="w-5" />
-          ) : (
-            <>
+        {isLoadingEvent || !event ? (
+          <Spinner className="w-5" />
+        ) : (
+          <>
+            <div className="w-full">
               <div className="mt-5 bg-white shadow-md md:w-[480px] lg:w-[100%] p-6 relative">
                 <div>
                   <h3 className="text-xl font-semibold text-gray-dark">
@@ -325,41 +325,49 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
                   </List>
                 )}
               </div>
-            </>
-          )}
-        </div>
+            </div>
 
-        <div className="mt-5 w-full">
-          <div className=" bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6">
-            <div>
-              <h3 className="text-lg text-gray-dark max-w-sm">Convidados</h3>
+            <div className="mt-5 w-full">
+              <div className=" bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6">
+                <div>
+                  <h3 className="text-lg text-gray-dark max-w-sm">
+                    Convidados
+                  </h3>
+                </div>
+                <div className="mt-3 flex overflow-x-auto gap-2 p-3">
+                  <Link
+                    href={routes.private.eventGuests.create(
+                      shortName,
+                      event?.id || ""
+                    )}
+                    className="bg-white shadow-md p-2 w-32 flex flex-col items-center rounded-xl hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <Image src={PlusIcon} alt="Plus icon" className="w-7" />
+                    <span className="text-sm text-gray font-semibold text-center">
+                      Adicionar
+                    </span>
+                  </Link>
+                  <Link
+                    href={routes.private.eventGuests.list(
+                      shortName,
+                      event?.id || ""
+                    )}
+                    className="bg-white shadow-md p-2 w-32 flex flex-col items-center rounded-xl hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <Image
+                      src={GroupPeopleIcon}
+                      alt="Group People icon"
+                      className="w-7"
+                    />
+                    <span className="text-sm text-gray font-semibold text-center">
+                      Listar
+                    </span>
+                  </Link>
+                </div>
+              </div>
             </div>
-            <div className="mt-3 flex overflow-x-auto gap-2 p-3">
-              <Link
-                href={routes.private.eventGuests.create(event?.id || "")}
-                className="bg-white shadow-md p-2 w-32 flex flex-col items-center rounded-xl hover:shadow-lg transition-shadow duration-300"
-              >
-                <Image src={PlusIcon} alt="Plus icon" className="w-7" />
-                <span className="text-sm text-gray font-semibold text-center">
-                  Adicionar
-                </span>
-              </Link>
-              <Link
-                href={routes.private.eventGuests.create(event?.id || "")}
-                className="bg-white shadow-md p-2 w-32 flex flex-col items-center rounded-xl hover:shadow-lg transition-shadow duration-300"
-              >
-                <Image
-                  src={GroupPeopleIcon}
-                  alt="Group People icon"
-                  className="w-7"
-                />
-                <span className="text-sm text-gray font-semibold text-center">
-                  Listar
-                </span>
-              </Link>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       <Dialog

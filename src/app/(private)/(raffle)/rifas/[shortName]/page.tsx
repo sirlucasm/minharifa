@@ -155,7 +155,8 @@ export default function ShowRaffle({ params, searchParams }: ShowRaffleProps) {
   );
 
   const onSubmit: SubmitHandler<CreateRaffleUserDto> = useCallback(
-    async (data) => {
+    async (data, e) => {
+      e?.preventDefault();
       if (!raffle) return;
       setIsLoadingSaveRaffleUser(true);
       try {
