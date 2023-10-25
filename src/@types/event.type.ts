@@ -90,7 +90,7 @@ export interface CreateEventGuestDto {
 export interface IEventGuestGroup {
   id: string;
   name: string;
-  guests: string[];
+  guests: IEventGuest[];
   eventId: string;
   isFamily: boolean;
   qrCodeImageUrl?: string;
@@ -99,4 +99,6 @@ export interface IEventGuestGroup {
 }
 
 export interface CreateEventGuestGroupDto
-  extends Omit<IEventGuestGroup, "id"> {}
+  extends Omit<Omit<IEventGuestGroup, "id">, "guests"> {
+  guests: string[];
+}
