@@ -3,7 +3,6 @@ import { db } from "@/configs/firebase";
 import {
   DocumentData,
   and,
-  arrayUnion,
   collection,
   doc,
   getDoc,
