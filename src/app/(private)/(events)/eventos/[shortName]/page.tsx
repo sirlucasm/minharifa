@@ -374,7 +374,7 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
         open={showConfirmEventDeleteDialog}
         handler={handleOpenConfirmEventDeleteDialog}
       >
-        <DialogHeader>Excluir rifa</DialogHeader>
+        <DialogHeader>Excluir evento</DialogHeader>
         <DialogBody>Tem certeza que deseja excluir este evento?</DialogBody>
         <DialogFooter className="space-x-2">
           <Button onClick={handleOpenConfirmEventDeleteDialog}>Não</Button>

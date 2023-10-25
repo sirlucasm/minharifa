@@ -11,9 +11,15 @@ import {
   AccordionBody,
   AccordionHeader,
   Breadcrumbs,
+  IconButton,
+  Menu,
+  MenuHandler,
+  MenuItem,
+  MenuList,
 } from "@material-tailwind/react";
 
 import PlusIcon from "@/assets/icons/plus.svg?url";
+import MenuDotHorizontalIcon from "@/assets/icons/menu-dot-horizontal.svg?url";
 
 import {
   DocumentData,
@@ -25,6 +31,7 @@ import {
 import { db } from "@/configs/firebase";
 import { IEventGuest, IEventGuestGroup } from "@/@types/event.type";
 import Divider from "@/components/common/Divider";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 interface ListEventGuestsProps {
   params: {
@@ -40,6 +47,12 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
   const [guestGroups, setGuestGroups] = useState<IEventGuestGroup[]>([]);
 
   const [openGuestGroupAccordion, setOpenGuestGroupAccordion] = useState(0);
+  const [showConfirmGuestDeleteDialog, setShowConfirmGuestDeleteDialog] =
+    useState(false);
+  const [
+    showConfirmGuestGroupDeleteDialog,
+    setShowConfirmGuestGroupDeleteDialog,
+  ] = useState(false);
 
   const handleOpenGuestGroupAccordion = useCallback(
     (value: number) => {
@@ -48,6 +61,22 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
       );
     },
     [openGuestGroupAccordion]
+  );
+
+  const handleOpenConfirmDeleteDialog = useCallback(
+    (deleteType: "guest" | "guestGroup") => {
+      switch (deleteType) {
+        case "guest":
+          setShowConfirmGuestDeleteDialog(!showConfirmGuestDeleteDialog);
+          break;
+        case "guestGroup":
+          setShowConfirmGuestGroupDeleteDialog(
+            !showConfirmGuestGroupDeleteDialog
+          );
+          break;
+      }
+    },
+    [showConfirmGuestDeleteDialog, showConfirmGuestGroupDeleteDialog]
   );
 
   useEffect(() => {
@@ -151,11 +180,11 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
               <Accordion
                 key={guestGroup.id}
                 open={openGuestGroupAccordion === i + 1}
-                className="bg-white shadow-md py-4 px-6 rounded-xl w-fit"
+                className="bg-white shadow-md py-4 px-6 rounded-xl w-fit relative"
               >
                 <AccordionHeader
                   onClick={() => handleOpenGuestGroupAccordion(i + 1)}
-                  className="border-0 py-0"
+                  className="border-0 py-0 flex"
                 >
                   <span className="text-sm text-gray-dark">
                     {guestGroup.isFamily ? "Familia " : "Grupo "}
@@ -171,23 +200,88 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
                     </div>
                   ))}
                 </AccordionBody>
+                <Menu>
+                  <MenuHandler>
+                    <IconButton
+                      className="!absolute right-2 top-2"
+                      variant="text"
+                    >
+                      <Image
+                        src={MenuDotHorizontalIcon}
+                        alt="MenuDotHorizontal icon"
+                        className="w-12"
+                      />
+                    </IconButton>
+                  </MenuHandler>
+                  <MenuList>
+                    <MenuItem className="outline-none hover:!outline-none">
+                      Editar
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() =>
+                        handleOpenConfirmDeleteDialog("guestGroup")
+                      }
+                      className="outline-none text-danger hover:!text-danger hover:!outline-none"
+                    >
+                      Excluir
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
               </Accordion>
             ))}
           </div>
           <div className="flex flex-col gap-2">
             {guests.map((guest, i) => (
               <div
-                className="bg-white shadow-md py-4 px-6 rounded-xl"
+                className="bg-white shadow-md py-4 px-6 rounded-xl relative"
                 key={guest.id}
               >
                 <span className="text-sm text-gray-dark">
                   {i + 1} - {guest.name}
                 </span>
+                <Menu>
+                  <MenuHandler>
+                    <IconButton
+                      className="!absolute right-2 top-2"
+                      variant="text"
+                    >
+                      <Image
+                        src={MenuDotHorizontalIcon}
+                        alt="MenuDotHorizontal icon"
+                        className="w-12"
+                      />
+                    </IconButton>
+                  </MenuHandler>
+                  <MenuList>
+                    <MenuItem className="outline-none hover:!outline-none">
+                      Editar
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => handleOpenConfirmDeleteDialog("guest")}
+                      className="outline-none text-danger hover:!text-danger hover:!outline-none"
+                    >
+                      Excluir
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
               </div>
             ))}
           </div>
         </div>
       </div>
+      <ConfirmDeleteDialog
+        open={showConfirmGuestDeleteDialog}
+        handler={() => handleOpenConfirmDeleteDialog("guest")}
+        handleDelete={() => {}}
+        header="Excluir convidado"
+      />
+
+      <ConfirmDeleteDialog
+        open={showConfirmGuestGroupDeleteDialog}
+        handler={() => handleOpenConfirmDeleteDialog("guestGroup")}
+        handleDelete={() => {}}
+        header="Excluir grupo de convidados"
+      />
     </Wrapper>
   );
 }
