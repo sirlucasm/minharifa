@@ -24,20 +24,6 @@ import { ERRORS, FIREBASE_ERRORS } from "@/constants";
 const usersRef = collection(db, "users");
 
 class AuthService {
-  hasVerifiedAccountAuthentication = async (email: string) => {
-    const q = query(
-      usersRef,
-      and(
-        where("email", "==", email),
-        where("lastVerificationAt", ">=", moment().subtract(30, "day").toDate())
-      )
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    return !querySnapshot.empty;
-  };
-
   getUser = async (emailOrUsername: string) => {
     const isEmail = emailOrUsername && emailOrUsername.includes("@");
 

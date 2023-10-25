@@ -30,6 +30,8 @@ const routes = {
         `/eventos/${shortName}/${eventId}/convidados`,
       create: (shortName: string, eventId: string) =>
         `/eventos/${shortName}/${eventId}/convidados/adicionar`,
+      createGroup: (shortName: string, eventId: string) =>
+        `/eventos/${shortName}/${eventId}/convidados/criar-grupo`,
     },
   },
 };

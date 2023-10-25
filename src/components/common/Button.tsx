@@ -34,7 +34,7 @@ const Button = ({
           "text-primary text-sm normal-case border-primary border-[1px]",
         props.className
       )}
-      disabled={isLoading}
+      disabled={isLoading || props.disabled}
     >
       {isLoading ? <Spinner className="mx-auto" /> : children}
     </MButton>

@@ -3,6 +3,7 @@ import { db } from "@/configs/firebase";
 import {
   DocumentData,
   and,
+  arrayUnion,
   collection,
   doc,
   getDoc,
@@ -19,6 +20,8 @@ import { convertCurrencyToNumber } from "@/utils/currency";
 import {
   CreateEventBudgetDto,
   CreateEventDto,
+  CreateEventGuestDto,
+  CreateEventGuestGroupDto,
   IEvent,
   UpdateEventBudgetDto,
 } from "@/@types/event.type";
@@ -28,6 +31,8 @@ import { IUser } from "@/@types/user.type";
 const eventRef = collection(db, "events");
 // const eventUsersRef = collection(db, "eventUsers");
 // const eventInvitationsRef = collection(db, "eventInvitations");
+const eventGuestsRef = collection(db, "eventGuests");
+const eventGuestGroupsRef = collection(db, "eventGuestGroups");
 const eventBudgetsRef = collection(db, "eventBudgets");
 
 class EventService {
@@ -170,6 +175,30 @@ class EventService {
       value: convertCurrencyToNumber(data.value as unknown as string),
       updatedAt: new Date(),
     });
+  };
+
+  addEventGuest = async (data: CreateEventGuestDto) => {
+    const eventGuestDoc = doc(eventGuestsRef);
+
+    await setDoc(eventGuestDoc, {
+      ...data,
+      id: eventGuestDoc.id,
+      createdAt: new Date(),
+      isDeleted: false,
+      isPresentInTheEvent: false,
+      isPresenceConfirmed: false,
+    } as CreateEventGuestDto);
+  };
+
+  createEventGuestGroup = async (data: CreateEventGuestGroupDto) => {
+    const eventGuestGroupDoc = doc(eventGuestGroupsRef);
+
+    await setDoc(eventGuestGroupDoc, {
+      ...data,
+      id: eventGuestGroupDoc.id,
+      createdAt: new Date(),
+      isDeleted: false,
+    } as unknown as CreateEventGuestGroupDto);
   };
 }
 

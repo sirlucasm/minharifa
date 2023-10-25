@@ -33,3 +33,21 @@ export const createEventBudgetSchema = yup.object({
   name: yup.string().required("Você deve informar um nome"),
   value: yup.string().required("Você deve informar o valor do orçamento"),
 });
+
+export const createEventGuestSchema = yup.object({
+  name: yup.string().required("Você deve informar um nome"),
+  email: yup.string().email("Digite um e-mail válido"),
+  cellPhone: yup.string(),
+});
+
+export const createEventGuestGroupSchema = yup.object({
+  name: yup.string().required("Você deve informar um nome"),
+  guests: yup
+    .array(
+      yup.object({
+        id: yup.string(),
+      })
+    )
+    .min(2),
+  isFamily: yup.boolean(),
+});

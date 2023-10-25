@@ -63,3 +63,40 @@ export interface UpdateEventBudgetDto {
   userId: string;
   eventId: string;
 }
+
+export interface IEventGuest {
+  id: string;
+  name: string;
+  email?: string;
+  cellPhone?: string;
+  eventId: string;
+  isPresentInTheEvent: boolean;
+  isPresenceConfirmed: boolean;
+  createdAt: Timestamp;
+  deletedAt: Timestamp;
+  isDeleted: boolean;
+}
+
+export interface CreateEventGuestDto {
+  name: string;
+  email?: string;
+  cellPhone?: string;
+  eventId: string;
+  isPresentInTheEvent: boolean;
+  isPresenceConfirmed: boolean;
+  isDeleted: boolean;
+}
+
+export interface IEventGuestGroup {
+  id: string;
+  name: string;
+  guests: string[];
+  eventId: string;
+  isFamily: boolean;
+  qrCodeImageUrl?: string;
+  createdAt: Timestamp;
+  isDeleted: boolean;
+}
+
+export interface CreateEventGuestGroupDto
+  extends Omit<IEventGuestGroup, "id"> {}

@@ -30,7 +30,7 @@ import { createEventBudgetSchema } from "@/schemas/event";
 import eventService from "@/services/event";
 import { convertNumberToCurrency, maskValueToCurrency } from "@/utils/currency";
 
-interface InvitesModalProps {
+interface CreateEventBudgetModalProps {
   open: boolean;
   handler: () => void;
   event: IEvent | undefined;
@@ -44,7 +44,7 @@ export default function CreateEventBudgetModal({
   event,
   eventBudget,
   setSelectedEventBudget,
-}: InvitesModalProps) {
+}: CreateEventBudgetModalProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const {
