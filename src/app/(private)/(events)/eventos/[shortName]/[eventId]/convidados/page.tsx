@@ -180,7 +180,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
               <Accordion
                 key={guestGroup.id}
                 open={openGuestGroupAccordion === i + 1}
-                className="bg-white shadow-md py-4 px-6 rounded-xl w-fit relative"
+                className="bg-white shadow-md py-4 px-6 rounded-xl w-fit relative h-min"
               >
                 <AccordionHeader
                   onClick={() => handleOpenGuestGroupAccordion(i + 1)}

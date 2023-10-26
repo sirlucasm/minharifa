@@ -85,6 +85,7 @@ export interface CreateEventGuestDto {
   isPresentInTheEvent: boolean;
   isPresenceConfirmed: boolean;
   isDeleted: boolean;
+  qrCodeImageUrl: string;
 }
 
 export interface IEventGuestGroup {
@@ -93,7 +94,7 @@ export interface IEventGuestGroup {
   guests: IEventGuest[];
   eventId: string;
   isFamily: boolean;
-  qrCodeImageUrl?: string;
+  qrCodeImageUrl: string;
   createdAt: Timestamp;
   isDeleted: boolean;
 }

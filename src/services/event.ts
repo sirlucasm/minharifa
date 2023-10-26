@@ -1,4 +1,4 @@
-import { db } from "@/configs/firebase";
+import { db, storage } from "@/configs/firebase";
 
 import {
   DocumentData,
@@ -13,6 +13,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { generateInviteCode } from "@/utils/invitation";
 import { convertCurrencyToNumber } from "@/utils/currency";
 
@@ -26,6 +27,8 @@ import {
 } from "@/@types/event.type";
 import { ERRORS } from "@/constants";
 import { IUser } from "@/@types/user.type";
+import QRCode from "qrcode";
+import routes from "@/routes";
 
 const eventRef = collection(db, "events");
 // const eventUsersRef = collection(db, "eventUsers");
@@ -176,8 +179,32 @@ class EventService {
     });
   };
 
-  addEventGuest = async (data: CreateEventGuestDto) => {
+  addEventGuest = async (eventShortName: string, data: CreateEventGuestDto) => {
     const eventGuestDoc = doc(eventGuestsRef);
+    const eventGuestQRCodesStorageRef = ref(
+      storage,
+      `eventGuest/${eventGuestDoc.id}`
+    );
+    const eventAdminQRRedirectPage = `${
+      process.env.NEXT_PUBLIC_APP_URL
+    }${routes.private.eventGuests.readedQRCode(
+      eventShortName,
+      data.eventId,
+      eventGuestDoc.id
+    )}`;
+
+    const dataUrl = await QRCode.toDataURL(eventAdminQRRedirectPage, {
+      margin: 1,
+      color: {
+        dark: "09647d",
+      },
+    });
+
+    const blob = await (await fetch(dataUrl)).blob();
+
+    await uploadBytes(eventGuestQRCodesStorageRef, blob);
+
+    const qrCodeImageUrl = await getDownloadURL(eventGuestQRCodesStorageRef);
 
     await setDoc(eventGuestDoc, {
       ...data,
@@ -186,6 +213,7 @@ class EventService {
       isDeleted: false,
       isPresentInTheEvent: false,
       isPresenceConfirmed: false,
+      qrCodeImageUrl,
     } as CreateEventGuestDto);
   };
 

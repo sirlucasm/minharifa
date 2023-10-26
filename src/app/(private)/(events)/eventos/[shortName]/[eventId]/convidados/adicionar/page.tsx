@@ -55,19 +55,20 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
     async (data) => {
       setIsLoading(true);
       try {
-        await eventService.addEventGuest({
+        await eventService.addEventGuest(shortName, {
           ...data,
           eventId,
         });
         message.success("Convidado adicionado com sucesso");
         reset();
       } catch (error: any) {
+        console.log(error);
         message.error("Falha interna ao adicionar convidado");
       } finally {
         setIsLoading(false);
       }
     },
-    [eventId, reset]
+    [eventId, reset, shortName]
   );
 
   const handleOpenCreateGroupModal = useCallback(() => {

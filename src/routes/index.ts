@@ -32,6 +32,12 @@ const routes = {
         `/eventos/${shortName}/${eventId}/convidados/adicionar`,
       createGroup: (shortName: string, eventId: string) =>
         `/eventos/${shortName}/${eventId}/convidados/criar-grupo`,
+      readedQRCode: (
+        shortName: string,
+        eventId: string,
+        eventGuestId: string
+      ) =>
+        `/eventos/${shortName}/${eventId}/convidados/confirmar-presenca?eventgid=${eventGuestId}`,
     },
   },
 };
