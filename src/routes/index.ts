@@ -11,19 +11,23 @@ const routes = {
     raffle: {
       list: "/rifas",
       create: "/rifas/criar",
-      show: (slug: string) => `/rifas/${slug}`,
-      requestInvite: (slug: string) => `/rifas/${slug}/solicitar-convite`,
-      acceptInvite: (slug: string) => `/rifas/${slug}/aceitar-convite`,
-      edit: (slug: string) => `/rifas/${slug}/editar`,
+      show: (shortName: string) => `/rifas/${shortName}`,
+      requestInvite: (shortName: string) =>
+        `/rifas/${shortName}/solicitar-convite`,
+      acceptInvite: (shortName: string) =>
+        `/rifas/${shortName}/aceitar-convite`,
+      edit: (shortName: string) => `/rifas/${shortName}/editar`,
     },
 
     event: {
       list: "/eventos",
       create: "/eventos/criar",
-      show: (slug: string) => `/eventos/${slug}`,
-      requestInvite: (slug: string) => `/eventos/${slug}/solicitar-convite`,
-      acceptInvite: (slug: string) => `/eventos/${slug}/aceitar-convite`,
-      edit: (slug: string) => `/eventos/${slug}/editar`,
+      show: (shortName: string) => `/eventos/${shortName}`,
+      requestInvite: (shortName: string) =>
+        `/eventos/${shortName}/solicitar-convite`,
+      acceptInvite: (shortName: string) =>
+        `/eventos/${shortName}/aceitar-convite`,
+      edit: (shortName: string) => `/eventos/${shortName}/editar`,
     },
     eventGuests: {
       list: (shortName: string, eventId: string) =>
@@ -32,6 +36,8 @@ const routes = {
         `/eventos/${shortName}/${eventId}/convidados/adicionar`,
       createGroup: (shortName: string, eventId: string) =>
         `/eventos/${shortName}/${eventId}/convidados/criar-grupo`,
+      show: (shortName: string, eventId: string, eventGuestId: string) =>
+        `/eventos/${shortName}/${eventId}/convidados/ver?eventgid=${eventGuestId}`,
       readedQRCode: (
         shortName: string,
         eventId: string,

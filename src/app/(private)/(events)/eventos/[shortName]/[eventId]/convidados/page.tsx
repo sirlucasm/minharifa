@@ -16,10 +16,12 @@ import {
   MenuHandler,
   MenuItem,
   MenuList,
+  Tooltip,
 } from "@material-tailwind/react";
 
 import PlusIcon from "@/assets/icons/plus.svg?url";
 import MenuDotHorizontalIcon from "@/assets/icons/menu-dot-horizontal.svg?url";
+import CheckedIcon from "@/assets/icons/checked.svg?url";
 
 import {
   DocumentData,
@@ -32,6 +34,8 @@ import { db } from "@/configs/firebase";
 import { IEventGuest, IEventGuestGroup } from "@/@types/event.type";
 import Divider from "@/components/common/Divider";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
+import eventService from "@/services/event";
+import { message } from "antd";
 
 interface ListEventGuestsProps {
   params: {
@@ -45,7 +49,14 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
 
   const [guests, setGuests] = useState<IEventGuest[]>([]);
   const [guestGroups, setGuestGroups] = useState<IEventGuestGroup[]>([]);
+  const [selectedGuest, setSelectedGuest] = useState<IEventGuest | undefined>();
+  const [selectedGuestGroup, setSelectedGuestGroup] = useState<
+    IEventGuestGroup | undefined
+  >();
 
+  const [isLoadingRemoveGuest, setIsLoadingRemoveGuest] = useState(false);
+  const [isLoadingRemoveGuestGroup, setIsLoadingRemoveGuestGroup] =
+    useState(false);
   const [openGuestGroupAccordion, setOpenGuestGroupAccordion] = useState(0);
   const [showConfirmGuestDeleteDialog, setShowConfirmGuestDeleteDialog] =
     useState(false);
@@ -78,6 +89,32 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
     },
     [showConfirmGuestDeleteDialog, showConfirmGuestGroupDeleteDialog]
   );
+
+  const handleRemoveEventGuest = useCallback(async () => {
+    if (!selectedGuest) return;
+    setIsLoadingRemoveGuest(true);
+    try {
+      await eventService.removeEventGuest(selectedGuest.id);
+      message.success("Convidado removido com sucesso");
+    } catch (error) {
+      message.error("Falha ao remover convidado");
+    } finally {
+      setIsLoadingRemoveGuest(false);
+    }
+  }, [selectedGuest]);
+
+  const handleRemoveEventGuestGroup = useCallback(async () => {
+    if (!selectedGuestGroup) return;
+    setIsLoadingRemoveGuestGroup(true);
+    try {
+      await eventService.removeEventGuest(selectedGuestGroup.id);
+      message.success("Grupo/familia removida com sucesso");
+    } catch (error) {
+      message.error("Falha ao remover grupo/familia");
+    } finally {
+      setIsLoadingRemoveGuestGroup(false);
+    }
+  }, [selectedGuestGroup]);
 
   useEffect(() => {
     if (!eventId) return;
@@ -218,9 +255,10 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
                       Editar
                     </MenuItem>
                     <MenuItem
-                      onClick={() =>
-                        handleOpenConfirmDeleteDialog("guestGroup")
-                      }
+                      onClick={() => {
+                        handleOpenConfirmDeleteDialog("guestGroup");
+                        setSelectedGuestGroup(guestGroup);
+                      }}
                       className="outline-none text-danger hover:!text-danger hover:!outline-none"
                     >
                       Excluir
@@ -239,6 +277,17 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
                 <span className="text-sm text-gray-dark">
                   {i + 1} - {guest.name}
                 </span>
+                {guest.isPresenceConfirmed && (
+                  <div className="absolute top-4 right-14">
+                    <Tooltip content="Presença confirmada">
+                      <Image
+                        src={CheckedIcon}
+                        alt="Checked green icon"
+                        className="w-6"
+                      />
+                    </Tooltip>
+                  </div>
+                )}
                 <Menu>
                   <MenuHandler>
                     <IconButton
@@ -253,11 +302,24 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
                     </IconButton>
                   </MenuHandler>
                   <MenuList>
+                    <Link
+                      href={routes.private.eventGuests.show(
+                        shortName,
+                        eventId,
+                        guest.id
+                      )}
+                      className="outline-none hover:!outline-none"
+                    >
+                      <MenuItem>Ver</MenuItem>
+                    </Link>
                     <MenuItem className="outline-none hover:!outline-none">
                       Editar
                     </MenuItem>
                     <MenuItem
-                      onClick={() => handleOpenConfirmDeleteDialog("guest")}
+                      onClick={() => {
+                        handleOpenConfirmDeleteDialog("guest");
+                        setSelectedGuest(guest);
+                      }}
                       className="outline-none text-danger hover:!text-danger hover:!outline-none"
                     >
                       Excluir
@@ -272,14 +334,16 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
       <ConfirmDeleteDialog
         open={showConfirmGuestDeleteDialog}
         handler={() => handleOpenConfirmDeleteDialog("guest")}
-        handleDelete={() => {}}
+        handleDelete={handleRemoveEventGuest}
+        isLoadingConfirm={isLoadingRemoveGuest}
         header="Excluir convidado"
       />
 
       <ConfirmDeleteDialog
         open={showConfirmGuestGroupDeleteDialog}
         handler={() => handleOpenConfirmDeleteDialog("guestGroup")}
-        handleDelete={() => {}}
+        handleDelete={handleRemoveEventGuestGroup}
+        isLoadingConfirm={isLoadingRemoveGuestGroup}
         header="Excluir grupo de convidados"
       />
     </Wrapper>

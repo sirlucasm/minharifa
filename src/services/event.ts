@@ -23,6 +23,7 @@ import {
   CreateEventGuestDto,
   CreateEventGuestGroupDto,
   IEvent,
+  IEventGuest,
   UpdateEventBudgetDto,
 } from "@/@types/event.type";
 import { ERRORS } from "@/constants";
@@ -217,6 +218,29 @@ class EventService {
     } as CreateEventGuestDto);
   };
 
+  removeEventGuest = async (eventGuestId: string) => {
+    const eventGuestDoc = doc(eventGuestsRef, eventGuestId);
+
+    await updateDoc(eventGuestDoc, {
+      isDeleted: true,
+      deletedAt: new Date(),
+    });
+  };
+
+  getEventGuest = async (eventGuestId: string) => {
+    const q = query(
+      eventGuestsRef,
+      where("id", "==", eventGuestId),
+      where("isDeleted", "==", false)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) throw ERRORS.eventGuest.notFound;
+
+    return querySnapshot.docs[0].data() as IEventGuest;
+  };
+
   createEventGuestGroup = async (data: CreateEventGuestGroupDto) => {
     const eventGuestGroupDoc = doc(eventGuestGroupsRef);
 
@@ -226,6 +250,15 @@ class EventService {
       createdAt: new Date(),
       isDeleted: false,
     } as unknown as CreateEventGuestGroupDto);
+  };
+
+  removeEventGuestGroup = async (eventGuestGroupId: string) => {
+    const eventGuestGroupDoc = doc(eventGuestGroupsRef, eventGuestGroupId);
+
+    await updateDoc(eventGuestGroupDoc, {
+      isDeleted: true,
+      deletedAt: new Date(),
+    });
   };
 }
 

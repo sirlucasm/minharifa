@@ -49,6 +49,12 @@ export const ERRORS = {
       message: "O orçamento não foi encontrado",
     },
   },
+  eventGuest: {
+    notFound: {
+      code: "eventGuest/notFound",
+      message: "O convidado não foi encontrado",
+    },
+  },
 };
 
 export const FIREBASE_ERRORS = {
