@@ -1,12 +1,19 @@
 "use client";
 
-import { IEventGuest } from "@/@types/event.type";
-import { Wrapper } from "@/components/common/Wrapper";
-import eventService from "@/services/event";
-import { Spinner } from "@material-tailwind/react";
-import { message } from "antd";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+
+import { Wrapper } from "@/components/common/Wrapper";
+import { Checkbox, Spinner } from "@material-tailwind/react";
+import { message } from "antd";
+
+import ExclamationIcon from "@/assets/icons/exclamation.svg?url";
+
+import { IEventGuest } from "@/@types/event.type";
+import eventService from "@/services/event";
+import useAuth from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import routes from "@/routes";
 
 interface ShowEventGuestProps {
   params: {
@@ -18,8 +25,14 @@ interface ShowEventGuestProps {
   };
 }
 
-export default function ShowEventGuest({ searchParams }: ShowEventGuestProps) {
+export default function ShowEventGuest({
+  searchParams,
+  params,
+}: ShowEventGuestProps) {
+  const { shortName } = params;
   const { eventgid: eventGuestId } = searchParams;
+  const { currentUser } = useAuth();
+  const router = useRouter();
 
   const [guest, setGuest] = useState<IEventGuest | undefined>();
 
@@ -38,6 +51,34 @@ export default function ShowEventGuest({ searchParams }: ShowEventGuestProps) {
     }
   }, [eventGuestId]);
 
+  const handleUpdateEventGuestPrensence = useCallback(
+    async (e: ChangeEvent<HTMLInputElement>) => {
+      if (!eventGuestId) return;
+      try {
+        await eventService.updateEventGuest(eventGuestId, {
+          isPresentInTheEvent: e.target.checked,
+        });
+        message.success("Convidado confirmado no evento");
+      } catch (error: any) {
+        message.error(error.message);
+      }
+    },
+    [eventGuestId]
+  );
+
+  useEffect(() => {
+    if (!currentUser) return;
+    (async function () {
+      setIsLoadingGuest(true);
+      const isUserOwnerEvent = await eventService.isEventUserOwner(
+        shortName,
+        currentUser.id
+      );
+      setIsLoadingGuest(false);
+      if (!isUserOwnerEvent) router.replace(routes.private.event.list);
+    })();
+  }, [currentUser, router, shortName]);
+
   useEffect(() => {
     fetchEventGuest();
   }, [fetchEventGuest]);
@@ -51,16 +92,33 @@ export default function ShowEventGuest({ searchParams }: ShowEventGuestProps) {
           <div>
             <Image
               src={guest.qrCodeImageUrl as string}
-              width={300}
-              height={300}
+              width={256}
+              height={256}
               alt="QRCode guest invite"
               priority
               quality={90}
             />
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold text-gray">{guest.name}</h3>
+          <div className="mt-3 bg-info flex flex-col items-center text-center sm:flex-row rounded-lg py-1 px-3 gap-2 select-none">
+            <Image
+              src={ExclamationIcon}
+              alt="Exclamation icon"
+              className="w-4"
+            />
+            <span className="text-white text-xs">
+              Clique no nome para confirmar a presença no evento
+            </span>
+          </div>
+
+          <div className="mt-5">
+            <Checkbox
+              crossOrigin=""
+              label={guest.name}
+              color="blue"
+              onChange={handleUpdateEventGuestPrensence}
+              checked={guest.isPresentInTheEvent}
+            />
           </div>
         </div>
       )}

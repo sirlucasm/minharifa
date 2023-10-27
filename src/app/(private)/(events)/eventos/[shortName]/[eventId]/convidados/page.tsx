@@ -22,6 +22,7 @@ import {
 import PlusIcon from "@/assets/icons/plus.svg?url";
 import MenuDotHorizontalIcon from "@/assets/icons/menu-dot-horizontal.svg?url";
 import CheckedIcon from "@/assets/icons/checked.svg?url";
+import CalendarCheckedIcon from "@/assets/icons/calendar-checked.svg?url";
 
 import {
   DocumentData,
@@ -36,6 +37,8 @@ import Divider from "@/components/common/Divider";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import eventService from "@/services/event";
 import { message } from "antd";
+import useAuth from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 interface ListEventGuestsProps {
   params: {
@@ -46,6 +49,8 @@ interface ListEventGuestsProps {
 
 export default function ListEventGuests({ params }: ListEventGuestsProps) {
   const { eventId, shortName } = params;
+  const { currentUser } = useAuth();
+  const router = useRouter();
 
   const [guests, setGuests] = useState<IEventGuest[]>([]);
   const [guestGroups, setGuestGroups] = useState<IEventGuestGroup[]>([]);
@@ -157,6 +162,17 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
 
     return () => unsub();
   }, [eventId, guests]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    (async function () {
+      const isUserOwnerEvent = await eventService.isEventUserOwner(
+        shortName,
+        currentUser.id
+      );
+      if (!isUserOwnerEvent) router.replace(routes.private.event.list);
+    })();
+  }, [currentUser, router, shortName]);
 
   return (
     <Wrapper className="mt-5 mb-10 w-full">
@@ -271,23 +287,38 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
           <div className="flex flex-col gap-2">
             {guests.map((guest, i) => (
               <div
-                className="bg-white shadow-md py-4 px-6 rounded-xl relative"
+                className="bg-white shadow-md py-4 px-6 rounded-xl relative flex items-center justify-between"
                 key={guest.id}
               >
-                <span className="text-sm text-gray-dark">
-                  {i + 1} - {guest.name}
-                </span>
-                {guest.isPresenceConfirmed && (
-                  <div className="absolute top-4 right-14">
-                    <Tooltip content="Presença confirmada">
-                      <Image
-                        src={CheckedIcon}
-                        alt="Checked green icon"
-                        className="w-6"
-                      />
-                    </Tooltip>
-                  </div>
-                )}
+                <div>
+                  <span className="text-sm text-gray-dark">
+                    {i + 1} - {guest.name}
+                  </span>
+                </div>
+                <div className="flex items-center relative right-7 gap-2">
+                  {guest.isPresentInTheEvent && (
+                    <div className="">
+                      <Tooltip content="Presença no local confirmada">
+                        <Image
+                          src={CheckedIcon}
+                          alt="Checked green icon"
+                          className="w-6"
+                        />
+                      </Tooltip>
+                    </div>
+                  )}
+                  {guest.isPresenceConfirmed && (
+                    <div className="">
+                      <Tooltip content="Presença confirmada">
+                        <Image
+                          src={CalendarCheckedIcon}
+                          alt="Checked green icon"
+                          className="w-6"
+                        />
+                      </Tooltip>
+                    </div>
+                  )}
+                </div>
                 <Menu>
                   <MenuHandler>
                     <IconButton

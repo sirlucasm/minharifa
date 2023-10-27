@@ -88,6 +88,26 @@ class EventService {
     return events as IEvent[];
   };
 
+  isEventUserOwner = async (shortName: string, userId: string) => {
+    const q = query(
+      eventRef,
+      and(
+        or(
+          where("sharedUsers", "array-contains", userId),
+          where("userId", "==", userId)
+        ),
+        where("shortName", "==", shortName),
+        where("isDeleted", "==", false)
+      )
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) return false;
+
+    return true;
+  };
+
   get = async (shortName: string, userId: string) => {
     const q = query(
       eventRef,
@@ -239,6 +259,15 @@ class EventService {
     if (querySnapshot.empty) throw ERRORS.eventGuest.notFound;
 
     return querySnapshot.docs[0].data() as IEventGuest;
+  };
+
+  updateEventGuest = async (
+    eventGuestId: string,
+    data: Partial<CreateEventGuestDto>
+  ) => {
+    const eventGuestDoc = doc(eventGuestsRef, eventGuestId);
+
+    await updateDoc(eventGuestDoc, data);
   };
 
   createEventGuestGroup = async (data: CreateEventGuestGroupDto) => {
