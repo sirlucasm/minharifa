@@ -71,7 +71,7 @@ export default function ShowGuest({
 
       <LinkButton
         href={routes.private.eventGuests.list(shortName, eventId)}
-        className="mt-5"
+        containerClassName="mt-5"
       >
         Voltar
       </LinkButton>

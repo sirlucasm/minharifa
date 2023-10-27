@@ -153,7 +153,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
       guestGroups.forEach(
         (guestGroup) =>
           (guestGroup.guests = guests.filter((guest) =>
-            guestGroup.guests.includes(guest.id)
+            guestGroup.guestIds.includes(guest.id)
           ))
       );
 

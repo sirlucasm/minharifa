@@ -7,6 +7,7 @@ type LinkButtonProps = ButtonProps & {
   children?: React.ReactNode;
   colorVariant?: "primary" | "secondary" | "ghost" | "light" | "outlined";
   className?: string;
+  containerClassName?: string;
   href: string;
   isLoading?: boolean;
 };
@@ -15,10 +16,11 @@ const LinkButton = ({
   children,
   colorVariant = "primary",
   isLoading,
+  containerClassName,
   ...props
 }: LinkButtonProps) => {
   return (
-    <Link href={props.href}>
+    <Link href={props.href} className={containerClassName}>
       <Button
         {...(props as any)}
         variant={colorVariant === "ghost" ? "text" : "filled"}

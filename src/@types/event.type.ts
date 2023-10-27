@@ -92,6 +92,7 @@ export interface CreateEventGuestDto {
 export interface IEventGuestGroup {
   id: string;
   name: string;
+  guestIds: string[];
   guests: IEventGuest[];
   eventId: string;
   isFamily: boolean;
@@ -101,6 +102,4 @@ export interface IEventGuestGroup {
 }
 
 export interface CreateEventGuestGroupDto
-  extends Omit<Omit<IEventGuestGroup, "id">, "guests"> {
-  guests: string[];
-}
+  extends Omit<Omit<IEventGuestGroup, "id">, "guests"> {}

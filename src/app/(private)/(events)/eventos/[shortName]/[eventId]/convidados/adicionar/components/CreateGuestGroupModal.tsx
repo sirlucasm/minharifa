@@ -49,7 +49,7 @@ export default function CreateGuestGroupModal({
     async (data) => {
       setIsLoading(true);
       try {
-        data.guests = guests.map((guest) => guest.id);
+        data.guestIds = guests.map((guest) => guest.id);
         await eventService.createEventGuestGroup(shortName, {
           ...data,
           eventId,

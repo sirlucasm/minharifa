@@ -96,8 +96,6 @@ export default function ShowEventGuest({
     else if (type === "guest") fetchEventGuest();
   }, [fetchEventGuest, fetchEventGuestGroup, type]);
 
-  console.log(guestGroup);
-
   return (
     <Wrapper className="mt-5">
       {isLoadingGuest ? (

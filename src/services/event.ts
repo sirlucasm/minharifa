@@ -334,14 +334,19 @@ class EventService {
 
     const guestGroup = querySnapshot.docs[0].data() as IEventGuestGroup;
 
-    const guests: any[] = [];
+    const guestQuery = query(
+      eventGuestsRef,
+      where("id", "in", guestGroup.guestIds),
+      where("isDeleted", "==", false)
+    );
 
-    guestGroup.guests.forEach(async (guestId) => {
-      const guestDoc = await getDoc(
-        doc(eventGuestsRef, guestId as unknown as string)
-      );
-      guests.push(guestDoc.data());
-    });
+    const guestQuerySnapshot = await getDocs(guestQuery);
+
+    const guests: IEventGuest[] = [];
+
+    guestQuerySnapshot.forEach(async (snapshot) =>
+      guests.push(snapshot.data() as IEventGuest)
+    );
 
     guestGroup.guests = guests;
 

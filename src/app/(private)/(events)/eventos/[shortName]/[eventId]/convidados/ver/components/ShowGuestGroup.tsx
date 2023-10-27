@@ -1,3 +1,5 @@
+"use client";
+
 import { ChangeEvent, useCallback } from "react";
 import Image from "next/image";
 
@@ -77,7 +79,7 @@ export default function ShowGuestGroup({
 
       <LinkButton
         href={routes.private.eventGuests.list(shortName, eventId)}
-        className="mt-5"
+        containerClassName="mt-5"
       >
         Voltar
       </LinkButton>
