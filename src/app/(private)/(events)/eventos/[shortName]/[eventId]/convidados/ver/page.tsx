@@ -14,6 +14,7 @@ import eventService from "@/services/event";
 import useAuth from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import routes from "@/routes";
+import LinkButton from "@/components/common/LinkButton";
 
 interface ShowEventGuestProps {
   params: {
@@ -29,7 +30,7 @@ export default function ShowEventGuest({
   searchParams,
   params,
 }: ShowEventGuestProps) {
-  const { shortName } = params;
+  const { shortName, eventId } = params;
   const { eventgid: eventGuestId } = searchParams;
   const { currentUser } = useAuth();
   const router = useRouter();
@@ -89,7 +90,7 @@ export default function ShowEventGuest({
         <Spinner />
       ) : (
         <div className="flex flex-col items-center">
-          <div>
+          <div className="shadow-lg">
             <Image
               src={guest.qrCodeImageUrl as string}
               width={256}
@@ -100,7 +101,7 @@ export default function ShowEventGuest({
             />
           </div>
 
-          <div className="mt-3 bg-info flex flex-col items-center text-center sm:flex-row rounded-lg py-1 px-3 gap-2 select-none">
+          <div className="mt-5 bg-info flex flex-col items-center text-center sm:flex-row rounded-lg py-1 px-3 gap-2 select-none">
             <Image
               src={ExclamationIcon}
               alt="Exclamation icon"
@@ -117,9 +118,16 @@ export default function ShowEventGuest({
               label={guest.name}
               color="blue"
               onChange={handleUpdateEventGuestPrensence}
-              checked={guest.isPresentInTheEvent}
+              defaultChecked={guest.isPresentInTheEvent}
             />
           </div>
+
+          <LinkButton
+            href={routes.private.eventGuests.list(shortName, eventId)}
+            className="mt-5"
+          >
+            Voltar
+          </LinkButton>
         </div>
       )}
     </Wrapper>
