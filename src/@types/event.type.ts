@@ -95,6 +95,7 @@ export interface IEventGuestGroup {
   guests: IEventGuest[];
   eventId: string;
   isFamily: boolean;
+  qrCodeImageUrl: string;
   createdAt: Timestamp;
   isDeleted: boolean;
 }

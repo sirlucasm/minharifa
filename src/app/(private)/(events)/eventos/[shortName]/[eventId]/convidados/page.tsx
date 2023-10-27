@@ -267,6 +267,16 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
                     </IconButton>
                   </MenuHandler>
                   <MenuList>
+                    <Link
+                      href={routes.private.eventGuestGroups.show(
+                        shortName,
+                        eventId,
+                        guestGroup.id
+                      )}
+                      className="outline-none hover:!outline-none"
+                    >
+                      <MenuItem>Ver</MenuItem>
+                    </Link>
                     <MenuItem className="outline-none hover:!outline-none">
                       Editar
                     </MenuItem>

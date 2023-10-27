@@ -1,20 +1,18 @@
 "use client";
 
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
+import { redirect, useRouter } from "next/navigation";
 
 import { Wrapper } from "@/components/common/Wrapper";
-import { Checkbox, Spinner } from "@material-tailwind/react";
+import ShowGuest from "./components/ShowGuest";
+import ShowGuestGroup from "./components/ShowGuestGroup";
+import { Spinner } from "@material-tailwind/react";
 import { message } from "antd";
 
-import ExclamationIcon from "@/assets/icons/exclamation.svg?url";
-
-import { IEventGuest } from "@/@types/event.type";
+import { IEventGuest, IEventGuestGroup } from "@/@types/event.type";
 import eventService from "@/services/event";
 import useAuth from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
 import routes from "@/routes";
-import LinkButton from "@/components/common/LinkButton";
 
 interface ShowEventGuestProps {
   params: {
@@ -23,6 +21,8 @@ interface ShowEventGuestProps {
   };
   searchParams: {
     eventgid?: string;
+    eventguestgroupid?: string;
+    type?: "guest" | "group";
   };
 }
 
@@ -31,11 +31,24 @@ export default function ShowEventGuest({
   params,
 }: ShowEventGuestProps) {
   const { shortName, eventId } = params;
-  const { eventgid: eventGuestId } = searchParams;
+  const {
+    eventgid: eventGuestId,
+    eventguestgroupid: eventGuestGroupId,
+    type,
+  } = searchParams;
+
+  if (
+    !type ||
+    (type === "group" && !eventGuestGroupId) ||
+    (type === "guest" && !eventGuestId)
+  )
+    redirect(routes.private.eventGuests.list(shortName, eventId));
+
   const { currentUser } = useAuth();
   const router = useRouter();
 
   const [guest, setGuest] = useState<IEventGuest | undefined>();
+  const [guestGroup, setGuestGroup] = useState<IEventGuestGroup | undefined>();
 
   const [isLoadingGuest, setIsLoadingGuest] = useState(false);
 
@@ -52,20 +65,18 @@ export default function ShowEventGuest({
     }
   }, [eventGuestId]);
 
-  const handleUpdateEventGuestPrensence = useCallback(
-    async (e: ChangeEvent<HTMLInputElement>) => {
-      if (!eventGuestId) return;
-      try {
-        await eventService.updateEventGuest(eventGuestId, {
-          isPresentInTheEvent: e.target.checked,
-        });
-        message.success("Convidado confirmado no evento");
-      } catch (error: any) {
-        message.error(error.message);
-      }
-    },
-    [eventGuestId]
-  );
+  const fetchEventGuestGroup = useCallback(async () => {
+    if (!eventGuestGroupId) return;
+    setIsLoadingGuest(true);
+    try {
+      const response = await eventService.getEventGuestGroup(eventGuestGroupId);
+      setGuestGroup(response);
+    } catch (error: any) {
+      message.error(error.message);
+    } finally {
+      setIsLoadingGuest(false);
+    }
+  }, [eventGuestGroupId]);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -81,54 +92,31 @@ export default function ShowEventGuest({
   }, [currentUser, router, shortName]);
 
   useEffect(() => {
-    fetchEventGuest();
-  }, [fetchEventGuest]);
+    if (type === "group") fetchEventGuestGroup();
+    else if (type === "guest") fetchEventGuest();
+  }, [fetchEventGuest, fetchEventGuestGroup, type]);
+
+  console.log(guestGroup);
 
   return (
     <Wrapper className="mt-5">
-      {!guest || isLoadingGuest ? (
+      {isLoadingGuest ? (
         <Spinner />
+      ) : type === "guest" ? (
+        <ShowGuest
+          eventGuestId={eventGuestId}
+          eventId={eventId}
+          shortName={shortName}
+          guest={guest}
+        />
       ) : (
-        <div className="flex flex-col items-center">
-          <div className="shadow-lg">
-            <Image
-              src={guest.qrCodeImageUrl as string}
-              width={256}
-              height={256}
-              alt="QRCode guest invite"
-              priority
-              quality={90}
-            />
-          </div>
-
-          <div className="mt-5 bg-info flex flex-col items-center text-center sm:flex-row rounded-lg py-1 px-3 gap-2 select-none">
-            <Image
-              src={ExclamationIcon}
-              alt="Exclamation icon"
-              className="w-4"
-            />
-            <span className="text-white text-xs">
-              Clique no nome para confirmar a presença no evento
-            </span>
-          </div>
-
-          <div className="mt-5">
-            <Checkbox
-              crossOrigin=""
-              label={guest.name}
-              color="blue"
-              onChange={handleUpdateEventGuestPrensence}
-              defaultChecked={guest.isPresentInTheEvent}
-            />
-          </div>
-
-          <LinkButton
-            href={routes.private.eventGuests.list(shortName, eventId)}
-            className="mt-5"
-          >
-            Voltar
-          </LinkButton>
-        </div>
+        type === "group" && (
+          <ShowGuestGroup
+            eventId={eventId}
+            shortName={shortName}
+            guestGroup={guestGroup}
+          />
+        )
       )}
     </Wrapper>
   );

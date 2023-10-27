@@ -24,6 +24,7 @@ import {
   CreateEventGuestGroupDto,
   IEvent,
   IEventGuest,
+  IEventGuestGroup,
   UpdateEventBudgetDto,
 } from "@/@types/event.type";
 import { ERRORS } from "@/constants";
@@ -208,7 +209,7 @@ class EventService {
     );
     const eventAdminQRRedirectPage = `${
       process.env.NEXT_PUBLIC_APP_URL
-    }${routes.private.eventGuests.readedQRCode(
+    }${routes.private.eventGuests.shareQRCode(
       eventShortName,
       data.eventId,
       eventGuestDoc.id
@@ -270,14 +271,44 @@ class EventService {
     await updateDoc(eventGuestDoc, data);
   };
 
-  createEventGuestGroup = async (data: CreateEventGuestGroupDto) => {
+  createEventGuestGroup = async (
+    eventShortName: string,
+    data: CreateEventGuestGroupDto
+  ) => {
     const eventGuestGroupDoc = doc(eventGuestGroupsRef);
+    const eventGuestGroupQRCodesStorageRef = ref(
+      storage,
+      `eventGuestGroup/${eventGuestGroupDoc.id}`
+    );
+    const eventAdminQRRedirectPage = `${
+      process.env.NEXT_PUBLIC_APP_URL
+    }${routes.private.eventGuests.shareQRCode(
+      eventShortName,
+      data.eventId,
+      eventGuestGroupDoc.id
+    )}`;
+
+    const dataUrl = await QRCode.toDataURL(eventAdminQRRedirectPage, {
+      margin: 1,
+      color: {
+        dark: "09647d",
+      },
+    });
+
+    const blob = await (await fetch(dataUrl)).blob();
+
+    await uploadBytes(eventGuestGroupQRCodesStorageRef, blob);
+
+    const qrCodeImageUrl = await getDownloadURL(
+      eventGuestGroupQRCodesStorageRef
+    );
 
     await setDoc(eventGuestGroupDoc, {
       ...data,
       id: eventGuestGroupDoc.id,
       createdAt: new Date(),
       isDeleted: false,
+      qrCodeImageUrl,
     } as unknown as CreateEventGuestGroupDto);
   };
 
@@ -288,6 +319,42 @@ class EventService {
       isDeleted: true,
       deletedAt: new Date(),
     });
+  };
+
+  getEventGuestGroup = async (eventGuestGroupId: string) => {
+    const q = query(
+      eventGuestGroupsRef,
+      where("id", "==", eventGuestGroupId),
+      where("isDeleted", "==", false)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) throw ERRORS.eventGuest.notFound;
+
+    const guestGroup = querySnapshot.docs[0].data() as IEventGuestGroup;
+
+    const guests: any[] = [];
+
+    guestGroup.guests.forEach(async (guestId) => {
+      const guestDoc = await getDoc(
+        doc(eventGuestsRef, guestId as unknown as string)
+      );
+      guests.push(guestDoc.data());
+    });
+
+    guestGroup.guests = guests;
+
+    return guestGroup;
+  };
+
+  updateEventGuestGroup = async (
+    eventGuestGroupId: string,
+    data: Partial<CreateEventGuestGroupDto>
+  ) => {
+    const eventGuestGroupDoc = doc(eventGuestGroupsRef, eventGuestGroupId);
+
+    await updateDoc(eventGuestGroupDoc, data);
   };
 }
 

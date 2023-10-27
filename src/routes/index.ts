@@ -37,13 +37,19 @@ const routes = {
       createGroup: (shortName: string, eventId: string) =>
         `/eventos/${shortName}/${eventId}/convidados/criar-grupo`,
       show: (shortName: string, eventId: string, eventGuestId: string) =>
-        `/eventos/${shortName}/${eventId}/convidados/ver?eventgid=${eventGuestId}`,
-      readedQRCode: (
+        `/eventos/${shortName}/${eventId}/convidados/ver?eventgid=${eventGuestId}&type=guest`,
+      shareQRCode: (shortName: string, eventId: string, eventGuestId: string) =>
+        `/eventos/${shortName}/${eventId}/convidados/confirmar-presenca?eventgid=${eventGuestId}&type=group`,
+    },
+    eventGuestGroups: {
+      show: (shortName: string, eventId: string, eventGuestGroupId: string) =>
+        `/eventos/${shortName}/${eventId}/convidados/ver?eventguestgroupid=${eventGuestGroupId}&type=group`,
+      shareQRCode: (
         shortName: string,
         eventId: string,
-        eventGuestId: string
+        eventGuestGroupId: string
       ) =>
-        `/eventos/${shortName}/${eventId}/convidados/confirmar-presenca?eventgid=${eventGuestId}`,
+        `/eventos/${shortName}/${eventId}/convidados/confirmar-presenca?eventguestgroupid=${eventGuestGroupId}&type=group`,
     },
   },
 };
