@@ -1,18 +1,17 @@
 "use client";
-
 import { useCallback, useEffect, useState } from "react";
 import { redirect, useRouter } from "next/navigation";
 
 import { Wrapper } from "@/components/common/Wrapper";
-import ShowGuest from "./components/ShowGuest";
-import ShowGuestGroup from "./components/ShowGuestGroup";
-import { Spinner } from "@material-tailwind/react";
 import { message } from "antd";
 
-import { IEventGuest, IEventGuestGroup } from "@/@types/event.type";
-import eventService from "@/services/event";
 import useAuth from "@/hooks/useAuth";
 import routes from "@/routes";
+import { IEventGuest, IEventGuestGroup } from "@/@types/event.type";
+import eventService from "@/services/event";
+import { Spinner } from "@material-tailwind/react";
+import ShowGuestQRCode from "./components/ShowGuestQRCode";
+import ShowGuestGroupQRCode from "./components/ShowGuestGroupQRCode";
 
 interface ShowEventGuestProps {
   params: {
@@ -30,7 +29,7 @@ export default function ShowEventGuest({
   searchParams,
   params,
 }: ShowEventGuestProps) {
-  const { shortName, eventId } = params;
+  const { eventId, shortName } = params;
   const {
     eventgid: eventGuestId,
     eventguestgroupid: eventGuestGroupId,
@@ -97,24 +96,13 @@ export default function ShowEventGuest({
   }, [fetchEventGuest, fetchEventGuestGroup, type]);
 
   return (
-    <Wrapper className="mt-5">
+    <Wrapper>
       {isLoading ? (
         <Spinner />
       ) : type === "guest" ? (
-        <ShowGuest
-          eventGuestId={eventGuestId}
-          eventId={eventId}
-          shortName={shortName}
-          guest={guest}
-        />
+        <ShowGuestQRCode guest={guest} eventGuestId={eventGuestId} />
       ) : (
-        type === "group" && (
-          <ShowGuestGroup
-            eventId={eventId}
-            shortName={shortName}
-            guestGroup={guestGroup}
-          />
-        )
+        type === "group" && <ShowGuestGroupQRCode guestGroup={guestGroup} />
       )}
     </Wrapper>
   );

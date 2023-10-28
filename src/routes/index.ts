@@ -39,7 +39,7 @@ const routes = {
       show: (shortName: string, eventId: string, eventGuestId: string) =>
         `/eventos/${shortName}/${eventId}/convidados/ver?eventgid=${eventGuestId}&type=guest`,
       shareQRCode: (shortName: string, eventId: string, eventGuestId: string) =>
-        `/eventos/${shortName}/${eventId}/convidados/confirmar-presenca?eventgid=${eventGuestId}&type=group`,
+        `/eventos/${shortName}/${eventId}/convidados/confirmar-presenca?eventgid=${eventGuestId}&type=guest`,
     },
     eventGuestGroups: {
       show: (shortName: string, eventId: string, eventGuestGroupId: string) =>

@@ -220,6 +220,7 @@ class EventService {
       color: {
         dark: "09647d",
       },
+      width: 512,
     });
 
     const blob = await (await fetch(dataUrl)).blob();
@@ -293,6 +294,7 @@ class EventService {
       color: {
         dark: "09647d",
       },
+      width: 512,
     });
 
     const blob = await (await fetch(dataUrl)).blob();
