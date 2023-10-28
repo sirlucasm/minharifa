@@ -73,6 +73,10 @@ export interface IEventGuest {
   isPresentInTheEvent: boolean;
   isPresenceConfirmed: boolean;
   qrCodeImageUrl: string;
+  qrCodeColors: {
+    dark: string;
+    light: string;
+  };
   createdAt: Timestamp;
   deletedAt: Timestamp;
   isDeleted: boolean;
@@ -87,6 +91,10 @@ export interface CreateEventGuestDto {
   isPresenceConfirmed: boolean;
   isDeleted: boolean;
   qrCodeImageUrl: string;
+  qrCodeColors: {
+    dark: string;
+    light: string;
+  };
 }
 
 export interface IEventGuestGroup {
@@ -97,6 +105,10 @@ export interface IEventGuestGroup {
   eventId: string;
   isFamily: boolean;
   qrCodeImageUrl: string;
+  qrCodeColors: {
+    dark: string;
+    light: string;
+  };
   createdAt: Timestamp;
   isDeleted: boolean;
 }

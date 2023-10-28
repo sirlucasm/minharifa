@@ -22,14 +22,14 @@ export default function ShowGuestGroupQRCode({
     const blob = await (await fetch(guestGroup?.qrCodeImageUrl)).blob();
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "convite-qrcode.png";
+    a.download = `convite_${guestGroup.name}_qrcode.png`;
 
     a.addEventListener("click", () => {
       setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
     });
 
     a.click();
-  }, [guestGroup?.qrCodeImageUrl]);
+  }, [guestGroup?.name, guestGroup?.qrCodeImageUrl]);
 
   const handleConfirmPresence = useCallback(
     async (e: ChangeEvent<HTMLInputElement>, eventGuestId: string) => {
