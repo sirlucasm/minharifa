@@ -47,6 +47,7 @@ export interface IEventBudget {
   updatedAt: Timestamp;
   deletedAt: Timestamp;
   isDeleted: boolean;
+  isCompleted: boolean;
 }
 
 export interface CreateEventBudgetDto {
@@ -55,13 +56,7 @@ export interface CreateEventBudgetDto {
   userId: string;
   eventId: string;
   isDeleted: boolean;
-}
-
-export interface UpdateEventBudgetDto {
-  name?: string;
-  value?: number;
-  userId: string;
-  eventId: string;
+  isCompleted: boolean;
 }
 
 export interface IEventGuest {

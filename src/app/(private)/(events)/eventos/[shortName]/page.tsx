@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo, ChangeEvent } from "react";
 import { redirect, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Wrapper } from "@/components/common/Wrapper";
 import {
   Breadcrumbs,
+  Checkbox,
   Dialog,
   DialogBody,
   DialogFooter,
@@ -40,6 +41,7 @@ import {
   DocumentData,
   collection,
   onSnapshot,
+  orderBy,
   query,
   where,
 } from "firebase/firestore";
@@ -130,13 +132,27 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
     setStorage("show_money_progress", !showMoneyProgress);
   }, [showMoneyProgress]);
 
+  const handleUpdateBudgetCompleted = useCallback(
+    async (e: ChangeEvent<HTMLInputElement>, budgetId: string) => {
+      const checked = e.target.checked;
+
+      await eventService.updateEventBudget(budgetId, {
+        isCompleted: checked,
+      });
+
+      if (checked) message.success("Orçamento concluido com sucesso");
+    },
+    []
+  );
+
   useEffect(() => {
     if (!event) return;
     const eventBudgetsRef = collection(db, "eventBudgets");
     const q = query(
       eventBudgetsRef,
       where("eventId", "==", event.id),
-      where("isDeleted", "==", false)
+      where("isDeleted", "==", false),
+      orderBy("isCompleted", "asc")
     );
     const unsub = onSnapshot(q, (snapshot) => {
       const budgets: DocumentData[] = [];
@@ -269,7 +285,15 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
                             {convertNumberToCurrency(budget.value)}
                           </span>
                         </div>
-                        <ListItemSuffix>
+                        <ListItemSuffix className="flex items-center">
+                          <Checkbox
+                            crossOrigin=""
+                            defaultChecked={budget.isCompleted}
+                            onChange={(e) =>
+                              handleUpdateBudgetCompleted(e, budget.id)
+                            }
+                            color="green"
+                          />
                           <IconButton
                             className=""
                             variant="text"

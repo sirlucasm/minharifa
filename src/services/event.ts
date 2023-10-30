@@ -25,7 +25,6 @@ import {
   IEvent,
   IEventGuest,
   IEventGuestGroup,
-  UpdateEventBudgetDto,
 } from "@/@types/event.type";
 import { ERRORS } from "@/constants";
 import { IUser } from "@/@types/user.type";
@@ -177,14 +176,17 @@ class EventService {
       value: convertCurrencyToNumber(data.value as unknown as string),
       createdAt: new Date(),
       isDeleted: false,
+      isCompleted: false,
     });
   };
 
-  updateEventBudget = async (budgetId: string, data: UpdateEventBudgetDto) => {
+  updateEventBudget = async (
+    budgetId: string,
+    data: Partial<CreateEventBudgetDto>
+  ) => {
     const q = query(
       eventBudgetsRef,
       where("id", "==", budgetId),
-      where("eventId", "==", data.eventId),
       where("isDeleted", "==", false)
     );
 
@@ -194,9 +196,12 @@ class EventService {
 
     const eventBudgetDoc = querySnapshot.docs[0].ref;
 
+    if (data.value) {
+      data.value = convertCurrencyToNumber(data.value as unknown as string);
+    }
+
     await updateDoc(eventBudgetDoc, {
       ...data,
-      value: convertCurrencyToNumber(data.value as unknown as string),
       updatedAt: new Date(),
     });
   };
