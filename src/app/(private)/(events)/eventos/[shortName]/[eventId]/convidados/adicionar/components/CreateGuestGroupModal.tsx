@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
+import Image from "next/image";
 
 import {
   Checkbox,
@@ -7,15 +8,17 @@ import {
   DialogHeader,
 } from "@material-tailwind/react";
 import Input from "@/components/common/Input";
+import Button from "@/components/common/Button";
+import { message } from "antd";
+
 import useYupValidationResolver from "@/hooks/useYupValidationResolver";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { CreateEventGuestGroupDto, IEventGuest } from "@/@types/event.type";
 import { createEventGuestGroupSchema } from "@/schemas/event";
-import { message } from "antd";
 import { useRouter } from "next/navigation";
-import Button from "@/components/common/Button";
 import eventService from "@/services/event";
 import routes from "@/routes";
+import QRCode from "qrcode";
 
 interface CreateGuestGroupModalProps {
   open: boolean;
@@ -35,15 +38,19 @@ export default function CreateGuestGroupModal({
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [previewQRCode, setPreviewQRCode] = useState<string>("");
 
   const {
     handleSubmit,
     register,
     formState: { errors },
+    watch,
   } = useForm<CreateEventGuestGroupDto>({
     resolver: useYupValidationResolver(createEventGuestGroupSchema),
     mode: "onChange",
   });
+
+  const qrCodeColors = watch("qrCodeColors");
 
   const onSubmit: SubmitHandler<CreateEventGuestGroupDto> = useCallback(
     async (data) => {
@@ -66,6 +73,24 @@ export default function CreateGuestGroupModal({
     [eventId, guests, router, shortName]
   );
 
+  const handleChangeQRCodeColorPreview = useCallback(async () => {
+    if (!qrCodeColors?.dark || !qrCodeColors?.light) return;
+    const dataUrl = await QRCode.toDataURL("QR Code Color Preview", {
+      margin: 1,
+      color: {
+        dark: qrCodeColors.dark,
+        light: qrCodeColors.light,
+      },
+      width: 100,
+    });
+
+    setPreviewQRCode(dataUrl);
+  }, [qrCodeColors?.dark, qrCodeColors?.light]);
+
+  useEffect(() => {
+    handleChangeQRCodeColorPreview();
+  }, [handleChangeQRCodeColorPreview]);
+
   return (
     <Dialog open={open} handler={handler} size="xs">
       <DialogHeader>Criar grupo</DialogHeader>
@@ -78,7 +103,10 @@ export default function CreateGuestGroupModal({
             </span>
           </div>
         ))}
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-5">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="mt-5 flex flex-col gap-3"
+        >
           <div className="w-full sm:w-[280px]">
             <Input
               {...register("name")}
@@ -89,6 +117,30 @@ export default function CreateGuestGroupModal({
               <span className="text-danger text-xs">{errors.name.message}</span>
             )}
           </div>
+          <div className="w-full sm:w-[280px]">
+            <Input
+              {...register("qrCodeColors.dark")}
+              label="Cor escura (opcional)"
+              defaultValue="#09647d"
+              type="color"
+            />
+          </div>
+          <div className="w-full sm:w-[280px]">
+            <Input
+              {...register("qrCodeColors.light")}
+              label="Cor clara (opcional)"
+              defaultValue="#ffffff"
+              type="color"
+            />
+          </div>
+          {!!previewQRCode && (
+            <Image
+              src={previewQRCode}
+              alt="QR Code Color Preview"
+              width={100}
+              height={100}
+            />
+          )}
           <div className="mb-3">
             <Checkbox
               {...register("isFamily")}

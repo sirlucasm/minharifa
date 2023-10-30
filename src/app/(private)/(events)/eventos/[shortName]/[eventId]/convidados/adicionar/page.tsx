@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import routes from "@/routes";
 
 import { Wrapper } from "@/components/common/Wrapper";
@@ -23,6 +24,7 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "@/configs/firebase";
+import QRCode from "qrcode";
 
 interface CreateEventGuestsProps {
   params: {
@@ -38,6 +40,7 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
 
   const [recentSavedGuests, setRecentSavedGuests] = useState<IEventGuest[]>([]);
+  const [previewQRCode, setPreviewQRCode] = useState<string>("");
 
   const now = useMemo(() => new Date(), []);
 
@@ -46,10 +49,13 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
     register,
     formState: { errors },
     reset,
+    watch,
   } = useForm<CreateEventGuestDto>({
     resolver: useYupValidationResolver(createEventGuestSchema),
     mode: "onChange",
   });
+
+  const qrCodeColors = watch("qrCodeColors");
 
   const onSubmit: SubmitHandler<CreateEventGuestDto> = useCallback(
     async (data) => {
@@ -75,6 +81,20 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
     setShowCreateGroupModal(!showCreateGroupModal);
   }, [showCreateGroupModal]);
 
+  const handleChangeQRCodeColorPreview = useCallback(async () => {
+    if (!qrCodeColors?.dark || !qrCodeColors?.light) return;
+    const dataUrl = await QRCode.toDataURL("QR Code Color Preview", {
+      margin: 1,
+      color: {
+        dark: qrCodeColors.dark,
+        light: qrCodeColors.light,
+      },
+      width: 100,
+    });
+
+    setPreviewQRCode(dataUrl);
+  }, [qrCodeColors?.dark, qrCodeColors?.light]);
+
   useEffect(() => {
     if (!eventId) return;
     const eventGuestsRef = collection(db, "eventGuests");
@@ -92,6 +112,10 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
 
     return () => unsub();
   }, [eventId, now]);
+
+  useEffect(() => {
+    handleChangeQRCodeColorPreview();
+  }, [handleChangeQRCodeColorPreview]);
 
   return (
     <Wrapper className="mt-5 mb-10 w-full">
@@ -166,6 +190,39 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
               )}
             </div>
           </div>
+
+          <div>
+            <h3 className="text-md font-semibold">Cores QR Code</h3>
+          </div>
+
+          <div className="flex flex-col sm:flex-row w-full gap-3">
+            <div className="w-full sm:w-[280px]">
+              <Input
+                {...register("qrCodeColors.dark")}
+                error={!!errors.email?.message}
+                label="Cor escura (opcional)"
+                defaultValue="#09647d"
+                type="color"
+              />
+            </div>
+            <div className="w-full sm:w-[280px]">
+              <Input
+                {...register("qrCodeColors.light")}
+                error={!!errors.email?.message}
+                label="Cor clara (opcional)"
+                defaultValue="#ffffff"
+                type="color"
+              />
+            </div>
+          </div>
+          {!!previewQRCode && (
+            <Image
+              src={previewQRCode}
+              alt="QR Code Color Preview"
+              width={100}
+              height={100}
+            />
+          )}
           <Button className="self-start" type="submit" isLoading={isLoading}>
             Adicionar
           </Button>

@@ -222,10 +222,7 @@ class EventService {
 
     const dataUrl = await QRCode.toDataURL(eventAdminQRRedirectPage, {
       margin: 1,
-      color: {
-        dark: "#4F4F30",
-        light: "#E2D0BB",
-      },
+      color: data.qrCodeColors,
       width: 512,
     });
 
@@ -297,10 +294,7 @@ class EventService {
 
     const dataUrl = await QRCode.toDataURL(eventAdminQRRedirectPage, {
       margin: 1,
-      color: {
-        dark: "#4F4F30",
-        light: "#E2D0BB",
-      },
+      color: data.qrCodeColors,
       width: 512,
     });
 

@@ -38,6 +38,10 @@ export const createEventGuestSchema = yup.object({
   name: yup.string().required("Você deve informar um nome"),
   email: yup.string().email("Digite um e-mail válido"),
   cellPhone: yup.string(),
+  qrCodeColors: yup.object({
+    light: yup.string().default("#ffffff"),
+    dark: yup.string().default("#09647d"),
+  }),
 });
 
 export const createEventGuestGroupSchema = yup.object({
@@ -50,4 +54,8 @@ export const createEventGuestGroupSchema = yup.object({
     )
     .min(2),
   isFamily: yup.boolean(),
+  qrCodeColors: yup.object({
+    light: yup.string().default("#ffffff"),
+    dark: yup.string().default("#09647d"),
+  }),
 });
