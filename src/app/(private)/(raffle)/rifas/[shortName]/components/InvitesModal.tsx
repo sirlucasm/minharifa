@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useCallback } from "react";
 import Image from "next/image";
 import {
@@ -14,50 +15,22 @@ import CheckWhiteIcon from "@/assets/icons/check-white.svg?url";
 import CloseWhiteIcon from "@/assets/icons/close-white.svg?url";
 
 import { IRaffleInvite } from "@/@types/raffle.type";
-import raffleService from "@/services/raffle";
 
 interface InvitesModalProps {
   open: boolean;
   handler: () => void;
-  raffleInvites: IRaffleInvite[];
+  invites: any[];
+  handleAcceptInviteRequest(invite: any): void;
+  handleCancelInviteRequest(invite: any): void;
 }
 
 export default function InvitesModal({
   open,
   handler,
-  raffleInvites,
+  invites,
+  handleAcceptInviteRequest,
+  handleCancelInviteRequest,
 }: InvitesModalProps) {
-  const handleAcceptInviteRequest = useCallback(
-    async (invite: IRaffleInvite) => {
-      if (!invite) return;
-      try {
-        await raffleService.acceptRaffleInviteRequest({
-          invitatedUserId: invite.userId,
-          raffleId: invite.raffleId,
-          inviteId: invite.id,
-        });
-        message.success("Convite aceito com sucesso");
-        handler();
-      } catch (error: any) {
-        message.error(error.message);
-      }
-    },
-    [handler]
-  );
-
-  const handleCancelInviteRequest = useCallback(
-    async (invite: IRaffleInvite) => {
-      try {
-        await raffleService.cancelRaffleInviteRequest(invite.id);
-        message.success("Convite recusado com sucesso");
-        handler();
-      } catch (error: any) {
-        message.error(error.message);
-      }
-    },
-    [handler]
-  );
-
   return (
     <Dialog open={open} handler={handler}>
       <DialogHeader className="justify-between">
@@ -75,14 +48,14 @@ export default function InvitesModal({
       </DialogHeader>
       <DialogBody className="pt-0">
         <div className="flex flex-col gap-2">
-          {!raffleInvites.length ? (
+          {!invites.length ? (
             <div>
               <span className="text-xs text-gray italic">
-                Nenhuma solicitação de participação da rifa
+                Nenhuma solicitação de participação
               </span>
             </div>
           ) : (
-            raffleInvites.map((invite) => (
+            invites.map((invite) => (
               <div key={invite.id} className="flex items-center gap-3">
                 <Image
                   priority

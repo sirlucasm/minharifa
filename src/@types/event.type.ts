@@ -110,3 +110,15 @@ export interface IEventGuestGroup {
 
 export interface CreateEventGuestGroupDto
   extends Omit<Omit<IEventGuestGroup, "id">, "guests"> {}
+
+export interface IEventInvite {
+  id: string;
+  accepted: boolean;
+  eventId: string;
+  userId: string;
+  user: IUser;
+  createdAt: Timestamp;
+  acceptedAt: Timestamp;
+  isCanceled: boolean;
+  canceledAt: Timestamp;
+}

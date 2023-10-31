@@ -3,6 +3,7 @@ import { db, storage } from "@/configs/firebase";
 import {
   DocumentData,
   and,
+  arrayUnion,
   collection,
   doc,
   getDoc,
@@ -33,7 +34,7 @@ import routes from "@/routes";
 
 const eventRef = collection(db, "events");
 // const eventUsersRef = collection(db, "eventUsers");
-// const eventInvitationsRef = collection(db, "eventInvitations");
+const eventInvitationsRef = collection(db, "eventInvitations");
 const eventGuestsRef = collection(db, "eventGuests");
 const eventGuestGroupsRef = collection(db, "eventGuestGroups");
 const eventBudgetsRef = collection(db, "eventBudgets");
@@ -61,7 +62,7 @@ class EventService {
       id: eventDoc.id,
       createdAt: new Date(),
       isDeleted: false,
-      inviteUri: `${process.env.NEXT_PUBLIC_APP_URL}/rifas/${data.shortName}?cinvitation=${inviteCode}`,
+      inviteUri: `${process.env.NEXT_PUBLIC_APP_URL}/eventos/${data.shortName}?cinvitation=${inviteCode}`,
       inviteCode,
     });
   };
@@ -158,12 +159,56 @@ class EventService {
   };
 
   delete = async (eventId: string) => {
-    const raffleDoc = doc(eventRef, eventId);
+    const eventDoc = doc(eventRef, eventId);
 
-    await updateDoc(raffleDoc, {
+    await updateDoc(eventDoc, {
       isDeleted: true,
       deletedAt: new Date(),
       updatedAt: new Date(),
+    });
+  };
+
+  getOwnerUserAndEventByEventShortName = async (shortName: string) => {
+    const q = query(
+      eventRef,
+      where("shortName", "==", shortName),
+      where("isDeleted", "==", false)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) throw ERRORS.event.notFound;
+
+    const event = querySnapshot.docs[0].data() as IEvent;
+
+    const userRef = doc(db, "users", event.userId);
+    const userDoc = await getDoc(userRef);
+    const user = userDoc.data() as IUser;
+
+    return { event, user };
+  };
+
+  sendInviteRequest = async (eventId: string, invitedUserId: string) => {
+    const q = query(
+      eventInvitationsRef,
+      where("eventId", "==", eventId),
+      where("invitedUserId", "==", invitedUserId),
+      where("isCanceled", "==", false)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) throw ERRORS.event.inviteAlreadySent;
+
+    const eventInviteDoc = doc(eventInvitationsRef);
+
+    await setDoc(eventInviteDoc, {
+      id: eventInviteDoc.id,
+      createdAt: new Date(),
+      eventId,
+      accepted: false,
+      userId: invitedUserId,
+      isCanceled: false,
     });
   };
 
@@ -363,6 +408,38 @@ class EventService {
     const eventGuestGroupDoc = doc(eventGuestGroupsRef, eventGuestGroupId);
 
     await updateDoc(eventGuestGroupDoc, data);
+  };
+
+  acceptEventInviteRequest = async ({
+    eventId,
+    inviteId,
+    invitatedUserId,
+  }: {
+    invitatedUserId: string;
+    inviteId: string;
+    eventId: string;
+  }) => {
+    const eventInvitationsDoc = doc(eventInvitationsRef, inviteId);
+    const eventDoc = doc(eventRef, eventId);
+
+    await updateDoc(eventInvitationsDoc, {
+      accepted: true,
+      acceptedAt: new Date(),
+    });
+
+    await updateDoc(eventDoc, {
+      sharedUsers: arrayUnion(invitatedUserId),
+      updatedAt: new Date(),
+    });
+  };
+
+  cancelEventInviteRequest = async (inviteId: string) => {
+    const eventInvitationsDoc = doc(eventInvitationsRef, inviteId);
+
+    await updateDoc(eventInvitationsDoc, {
+      isCanceled: true,
+      canceledAt: new Date(),
+    });
   };
 }
 

@@ -42,6 +42,10 @@ export const ERRORS = {
       code: "event/notFound",
       message: "O Evento não foi encontrado",
     },
+    inviteAlreadySent: {
+      code: "event/inviteAlreadySent",
+      message: "Pedido de participação do evento já foi enviado",
+    },
   },
   eventBudget: {
     notFound: {

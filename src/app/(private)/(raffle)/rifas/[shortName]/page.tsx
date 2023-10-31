@@ -8,9 +8,7 @@ import Image from "next/image";
 import { Wrapper } from "@/components/common/Wrapper";
 import Input from "@/components/common/Input";
 import Button from "@/components/common/Button";
-import InvitesModal from "./components/InvitesModal";
 import {
-  Badge,
   Breadcrumbs,
   Dialog,
   DialogBody,
@@ -22,7 +20,6 @@ import {
   MenuItem,
   MenuList,
   Progress,
-  Spinner,
   Tooltip,
 } from "@material-tailwind/react";
 import { message } from "antd";
@@ -39,8 +36,6 @@ import cx from "classix";
 
 import PersonIcon from "@/assets/icons/person.svg?url";
 import HeartIcon from "@/assets/icons/heart.svg?url";
-import CopyIcon from "@/assets/icons/copy.svg?url";
-import MenuIcon from "@/assets/icons/profile.svg?url";
 import MenuDotHorizontalIcon from "@/assets/icons/menu-dot-horizontal.svg?url";
 
 import {
@@ -61,6 +56,7 @@ import useModalManager from "@/hooks/useModalManager";
 import moment from "moment";
 import { getStorage, setStorage } from "@/utils/storage";
 import { convertNumberToCurrency } from "@/utils/currency";
+import { InviteParticipant } from "@/components/InviteParticipant";
 
 interface ShowRaffleProps {
   params: {
@@ -235,6 +231,37 @@ ${Array.from(Array(raffle.quantity).keys())
     setShowMoneyProgress((prev: boolean) => !prev);
     setStorage("show_money_progress", !showMoneyProgress);
   }, [showMoneyProgress]);
+
+  const handleAcceptInviteRequest = useCallback(
+    async (invite: IRaffleInvite) => {
+      if (!invite) return;
+      try {
+        await raffleService.acceptRaffleInviteRequest({
+          invitatedUserId: invite.userId,
+          raffleId: invite.raffleId,
+          inviteId: invite.id,
+        });
+        message.success("Convite aceito com sucesso");
+        handleOpenInvitesModal();
+      } catch (error: any) {
+        message.error(error.message);
+      }
+    },
+    [handleOpenInvitesModal]
+  );
+
+  const handleCancelInviteRequest = useCallback(
+    async (invite: IRaffleInvite) => {
+      try {
+        await raffleService.cancelRaffleInviteRequest(invite.id);
+        message.success("Convite recusado com sucesso");
+        handleOpenInvitesModal();
+      } catch (error: any) {
+        message.error(error.message);
+      }
+    },
+    [handleOpenInvitesModal]
+  );
 
   useEffect(() => {
     if (!raffle) return;
@@ -456,87 +483,17 @@ ${Array.from(Array(raffle.quantity).keys())
           </form>
         )}
       </div>
-      <div className="mt-5 lg:mt-14 w-full">
-        <div className=" bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6 h-60 xs:h-52">
-          <div>
-            <h3 className="text-lg text-gray-dark max-w-sm">
-              Convide pessoas para gerenciar com você
-            </h3>
-          </div>
-          <div className="mt-5 relative">
-            <Input
-              variant="outlined"
-              defaultValue={raffle?.inviteUri}
-              className="pr-14"
-              disabled
-            />
-            <Button
-              colorVariant="ghost"
-              className="!absolute right-1 top-1 rounded"
-              size="sm"
-              onClick={handleCopyInviteLink}
-            >
-              <Image src={CopyIcon} alt="Copy Icon" className="w-5" />
-            </Button>
-          </div>
-          <div className="mt-4">
-            <Badge
-              invisible={!raffleInvites.length}
-              content={raffleInvites.length}
-            >
-              <Button
-                colorVariant="ghost"
-                size="sm"
-                onClick={handleOpenInvitesModal}
-              >
-                Gerenciar convites
-              </Button>
-            </Badge>
-          </div>
-          <InvitesModal
-            open={isOpenInvitesModal}
-            handler={handleOpenInvitesModal}
-            raffleInvites={raffleInvites}
-          />
-        </div>
-
-        <div className=" mt-5 bg-white shadow-md md:w-[480px] lg:w-[400px] xl:w-[100%] p-6 h-auto">
-          <div className="mb-5">
-            <h3 className="text-lg text-gray-dark max-w-sm">Participantes</h3>
-          </div>
-          {isLoadingRaffle ? (
-            <div className="flex justify-center">
-              <Spinner />
-            </div>
-          ) : raffle?.sharedUsers && !raffle.sharedUsers.length ? (
-            <div>
-              <span className="text-xs text-gray italic">
-                Você ainda não possui participantes
-              </span>
-            </div>
-          ) : (
-            <div className="flex flex-wrap justify-start gap-4">
-              {!!raffle &&
-                raffle.participants.map((participant) => (
-                  <div
-                    key={participant.id}
-                    className="flex flex-col items-center gap-2 cursor-pointer select-none"
-                  >
-                    <Image
-                      priority
-                      src={participant.profileImageUrl || MenuIcon}
-                      alt="Profile image"
-                      className="w-14 rounded-full bg-gray-light p-2"
-                    />
-                    <span className="text-sm text-gray font-semibold">
-                      {participant.username}
-                    </span>
-                  </div>
-                ))}
-            </div>
-          )}
-        </div>
-      </div>
+      <InviteParticipant
+        containerClassName="mt-5 lg:mt-14"
+        handleCopyInviteLink={handleCopyInviteLink}
+        item={raffle}
+        handleOpenInvitesModal={handleOpenInvitesModal}
+        invites={raffleInvites}
+        isLoadingItem={isLoadingRaffle}
+        isOpenInvitesModal={isOpenInvitesModal}
+        handleAcceptInviteRequest={handleAcceptInviteRequest}
+        handleCancelInviteRequest={handleCancelInviteRequest}
+      />
       <Dialog
         open={showConfirmRaffleDeleteDialog}
         handler={handleOpenConfirmRaffleDeleteDialog}

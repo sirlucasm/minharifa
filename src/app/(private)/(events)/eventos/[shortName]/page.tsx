@@ -33,13 +33,15 @@ import GroupPeopleIcon from "@/assets/icons/group-people.svg?url";
 import routes from "@/routes";
 import eventService from "@/services/event";
 import useAuth from "@/hooks/useAuth";
-import { IEvent, IEventBudget } from "@/@types/event.type";
+import { IEvent, IEventBudget, IEventInvite } from "@/@types/event.type";
 import { message } from "antd";
 import { convertNumberToCurrency } from "@/utils/currency";
 import moment from "moment";
 import {
   DocumentData,
   collection,
+  doc,
+  getDoc,
   onSnapshot,
   orderBy,
   query,
@@ -49,6 +51,8 @@ import { db } from "@/configs/firebase";
 import CreateOrEditEventBudgetModal from "./components/CreateOrEditEventBudgetModal";
 import cx from "classix";
 import { getStorage, setStorage } from "@/utils/storage";
+import { InviteParticipant } from "@/components/InviteParticipant";
+import useModalManager from "@/hooks/useModalManager";
 
 interface ShowEventProps {
   params: {
@@ -67,6 +71,7 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
 
   const router = useRouter();
   const { currentUser } = useAuth();
+  const { setIsOpenInvitesModal, isOpenInvitesModal } = useModalManager();
 
   const [showConfirmEventDeleteDialog, setShowConfirmEventDeleteDialog] =
     useState(false);
@@ -80,6 +85,7 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
   );
   const [event, setEvent] = useState<IEvent | undefined>();
   const [eventBudgets, setEventBudgets] = useState<IEventBudget[]>([]);
+  const [eventInvites, setEventInvites] = useState<IEventInvite[]>([]);
   const [selectedEventBudget, setSelectedEventBudget] = useState<
     IEventBudget | undefined
   >();
@@ -145,6 +151,46 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
     []
   );
 
+  const handleOpenInvitesModal = useCallback(() => {
+    setIsOpenInvitesModal(!isOpenInvitesModal);
+  }, [isOpenInvitesModal, setIsOpenInvitesModal]);
+
+  const handleCopyInviteLink = useCallback(() => {
+    if (!window) return;
+    window.navigator.clipboard.writeText(event?.inviteUri as string);
+  }, [event?.inviteUri]);
+
+  const handleAcceptInviteRequest = useCallback(
+    async (invite: IEventInvite) => {
+      if (!invite) return;
+      try {
+        await eventService.acceptEventInviteRequest({
+          invitatedUserId: invite.userId,
+          eventId: invite.eventId,
+          inviteId: invite.id,
+        });
+        message.success("Convite aceito com sucesso");
+        handleOpenInvitesModal();
+      } catch (error: any) {
+        message.error(error.message);
+      }
+    },
+    [handleOpenInvitesModal]
+  );
+
+  const handleCancelInviteRequest = useCallback(
+    async (invite: IEventInvite) => {
+      try {
+        await eventService.cancelEventInviteRequest(invite.id);
+        message.success("Convite recusado com sucesso");
+        handleOpenInvitesModal();
+      } catch (error: any) {
+        message.error(error.message);
+      }
+    },
+    [handleOpenInvitesModal]
+  );
+
   useEffect(() => {
     if (!event) return;
     const eventBudgetsRef = collection(db, "eventBudgets");
@@ -166,6 +212,29 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
   useEffect(() => {
     fetchEvent();
   }, [fetchEvent]);
+
+  useEffect(() => {
+    if (!event) return;
+    const eventInvitationsRef = collection(db, "eventInvitations");
+    const q = query(
+      eventInvitationsRef,
+      where("eventId", "==", event.id),
+      where("isCanceled", "==", false),
+      where("accepted", "==", false)
+    );
+    const unsub = onSnapshot(q, (snapshot) => {
+      const invites: DocumentData[] = [];
+      snapshot.forEach(async (response) => {
+        const data = response.data();
+        const user = await getDoc(doc(db, "users", data.userId));
+        data.user = user.data();
+        invites.push(data);
+      });
+      setEventInvites(invites as IEventInvite[]);
+    });
+
+    return () => unsub();
+  }, [event, shortName]);
 
   return (
     <Wrapper className="mt-5 mb-10 w-full">
@@ -389,6 +458,18 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
                   </Link>
                 </div>
               </div>
+
+              <InviteParticipant
+                containerClassName="mt-5"
+                handleCopyInviteLink={handleCopyInviteLink}
+                item={event}
+                handleOpenInvitesModal={handleOpenInvitesModal}
+                invites={eventInvites}
+                isLoadingItem={isLoadingEvent}
+                isOpenInvitesModal={isOpenInvitesModal}
+                handleAcceptInviteRequest={handleAcceptInviteRequest}
+                handleCancelInviteRequest={handleCancelInviteRequest}
+              />
             </div>
           </>
         )}
