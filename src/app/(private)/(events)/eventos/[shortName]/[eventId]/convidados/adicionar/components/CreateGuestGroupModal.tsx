@@ -117,6 +117,11 @@ export default function CreateGuestGroupModal({
               <span className="text-danger text-xs">{errors.name.message}</span>
             )}
           </div>
+          <div>
+            <h3 className="text-md font-semibold text-gray-dark">
+              Cores QR Code
+            </h3>
+          </div>
           <div className="w-full sm:w-[280px]">
             <Input
               {...register("qrCodeColors.dark")}
