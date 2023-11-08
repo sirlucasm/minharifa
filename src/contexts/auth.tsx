@@ -39,6 +39,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setCurrentUser(Object.assign(user, fetchedCurrentUser));
         return;
       }
+      if (window.location.pathname.includes("convidados/confirmar-presenca")) {
+        return;
+      }
       router.replace(routes.public.login);
       setCurrentUser(undefined);
       setIsLoading(false);

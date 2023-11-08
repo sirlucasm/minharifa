@@ -1,9 +1,13 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 
 import { Wrapper } from "@/components/common/Wrapper";
 import { message } from "antd";
+
+import LogoImage from "@/assets/images/logo.svg?url";
 
 import routes from "@/routes";
 import { IEventGuest, IEventGuestGroup } from "@/@types/event.type";
@@ -79,7 +83,16 @@ export default function ShowEventGuest({
   }, [fetchEventGuest, fetchEventGuestGroup, type]);
 
   return (
-    <Wrapper>
+    <Wrapper className="mt-5">
+      <Link href={routes.public.login} className="flex items-center mb-6">
+        <Image
+          priority
+          src={LogoImage}
+          alt="Logo primary"
+          width={160}
+          className=""
+        />
+      </Link>
       {isLoading ? (
         <Spinner />
       ) : type === "guest" ? (
