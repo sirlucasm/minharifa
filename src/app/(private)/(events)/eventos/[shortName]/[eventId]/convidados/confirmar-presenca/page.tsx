@@ -1,11 +1,10 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { Wrapper } from "@/components/common/Wrapper";
 import { message } from "antd";
 
-import useAuth from "@/hooks/useAuth";
 import routes from "@/routes";
 import { IEventGuest, IEventGuestGroup } from "@/@types/event.type";
 import eventService from "@/services/event";
@@ -43,9 +42,6 @@ export default function ShowEventGuest({
   )
     redirect(routes.private.eventGuests.list(shortName, eventId));
 
-  const { currentUser } = useAuth();
-  const router = useRouter();
-
   const [guest, setGuest] = useState<IEventGuest | undefined>();
   const [guestGroup, setGuestGroup] = useState<IEventGuestGroup | undefined>();
 
@@ -76,19 +72,6 @@ export default function ShowEventGuest({
       setIsLoading(false);
     }
   }, [eventGuestGroupId]);
-
-  useEffect(() => {
-    if (!currentUser) return;
-    (async function () {
-      setIsLoading(true);
-      const isUserOwnerEvent = await eventService.isEventUserOwner(
-        shortName,
-        currentUser.id
-      );
-      setIsLoading(false);
-      if (!isUserOwnerEvent) router.replace(routes.private.event.list);
-    })();
-  }, [currentUser, router, shortName]);
 
   useEffect(() => {
     if (type === "group") fetchEventGuestGroup();
