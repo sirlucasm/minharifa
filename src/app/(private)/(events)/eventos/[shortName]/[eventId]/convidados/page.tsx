@@ -278,7 +278,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
                       <MenuItem>Ver</MenuItem>
                     </Link>
                     <Link
-                      href={routes.private.eventGuestGroups.shareQRCode(
+                      href={routes.public.eventGuestGroups.shareQRCode(
                         shortName,
                         eventId,
                         guestGroup.id
@@ -364,7 +364,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
                       <MenuItem>Ver</MenuItem>
                     </Link>
                     <Link
-                      href={routes.private.eventGuests.shareQRCode(
+                      href={routes.public.eventGuests.shareQRCode(
                         shortName,
                         eventId,
                         guest.id

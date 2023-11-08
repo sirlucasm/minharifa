@@ -4,6 +4,19 @@ const routes = {
     register: "/criar-conta",
     forgetPassword: "/esqueceu-senha",
     finishAccountCreation: "/criar-conta/finalizar",
+
+    eventGuests: {
+      shareQRCode: (shortName: string, eventId: string, eventGuestId: string) =>
+        `/eventos/${shortName}/${eventId}/convidados/confirmar-presenca?eventgid=${eventGuestId}&type=guest`,
+    },
+    eventGuestGroups: {
+      shareQRCode: (
+        shortName: string,
+        eventId: string,
+        eventGuestGroupId: string
+      ) =>
+        `/eventos/${shortName}/${eventId}/convidados/confirmar-presenca?eventguestgroupid=${eventGuestGroupId}&type=group`,
+    },
   },
   private: {
     home: "/inicio",
@@ -38,18 +51,10 @@ const routes = {
         `/eventos/${shortName}/${eventId}/convidados/criar-grupo`,
       show: (shortName: string, eventId: string, eventGuestId: string) =>
         `/eventos/${shortName}/${eventId}/convidados/ver?eventgid=${eventGuestId}&type=guest`,
-      shareQRCode: (shortName: string, eventId: string, eventGuestId: string) =>
-        `/eventos/${shortName}/${eventId}/convidados/confirmar-presenca?eventgid=${eventGuestId}&type=guest`,
     },
     eventGuestGroups: {
       show: (shortName: string, eventId: string, eventGuestGroupId: string) =>
         `/eventos/${shortName}/${eventId}/convidados/ver?eventguestgroupid=${eventGuestGroupId}&type=group`,
-      shareQRCode: (
-        shortName: string,
-        eventId: string,
-        eventGuestGroupId: string
-      ) =>
-        `/eventos/${shortName}/${eventId}/convidados/confirmar-presenca?eventguestgroupid=${eventGuestGroupId}&type=group`,
     },
   },
 };
