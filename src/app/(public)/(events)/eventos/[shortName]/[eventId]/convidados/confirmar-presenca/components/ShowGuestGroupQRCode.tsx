@@ -35,9 +35,12 @@ export default function ShowGuestGroupQRCode({
     async (e: ChangeEvent<HTMLInputElement>, eventGuestId: string) => {
       try {
         const checked = e.target.checked;
-        await eventService.updateEventGuest(eventGuestId, {
-          isPresenceConfirmed: checked,
-        });
+        await eventService.updateEventGuest(
+          { eventGuestId },
+          {
+            isPresenceConfirmed: checked,
+          }
+        );
         if (checked) message.success("Sua presença foi confirmada com sucesso");
       } catch (error: any) {
         message.error(error.message);

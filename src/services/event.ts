@@ -312,10 +312,50 @@ class EventService {
   };
 
   updateEventGuest = async (
-    eventGuestId: string,
+    params: {
+      eventGuestId: string;
+      eventShortName?: string;
+    },
     data: Partial<CreateEventGuestDto>
   ) => {
+    const { eventGuestId, eventShortName } = params;
     const eventGuestDoc = doc(eventGuestsRef, eventGuestId);
+
+    let qrCodeImageUrl;
+
+    if (eventShortName) {
+      const eventGuestQRCodesStorageRef = ref(
+        storage,
+        `eventGuest/${eventGuestDoc.id}`
+      );
+      const eventAdminQRRedirectPage = `${
+        process.env.NEXT_PUBLIC_APP_URL
+      }${routes.public.eventGuests.shareQRCode(
+        eventShortName,
+        data.eventId as string,
+        eventGuestDoc.id
+      )}`;
+
+      const dataUrl = await QRCode.toDataURL(eventAdminQRRedirectPage, {
+        margin: 1,
+        color: data.qrCodeColors,
+        width: 512,
+      });
+
+      const blob = await (await fetch(dataUrl)).blob();
+
+      await uploadBytes(eventGuestQRCodesStorageRef, blob);
+
+      qrCodeImageUrl = await getDownloadURL(eventGuestQRCodesStorageRef);
+    }
+
+    if (qrCodeImageUrl) {
+      await updateDoc(eventGuestDoc, {
+        ...data,
+        qrCodeImageUrl,
+      });
+      return;
+    }
 
     await updateDoc(eventGuestDoc, data);
   };
@@ -402,10 +442,49 @@ class EventService {
   };
 
   updateEventGuestGroup = async (
-    eventGuestGroupId: string,
+    params: {
+      eventGuestGroupId: string;
+      eventShortName?: string;
+    },
     data: Partial<CreateEventGuestGroupDto>
   ) => {
+    const { eventShortName, eventGuestGroupId } = params;
     const eventGuestGroupDoc = doc(eventGuestGroupsRef, eventGuestGroupId);
+
+    let qrCodeImageUrl;
+
+    if (eventShortName) {
+      const eventGuestGroupQRCodesStorageRef = ref(
+        storage,
+        `eventGuestGroup/${eventGuestGroupDoc.id}`
+      );
+      const eventAdminQRRedirectPage = `${
+        process.env.NEXT_PUBLIC_APP_URL
+      }${routes.public.eventGuests.shareQRCode(
+        eventShortName,
+        data.eventId as string,
+        eventGuestGroupDoc.id
+      )}`;
+      const dataUrl = await QRCode.toDataURL(eventAdminQRRedirectPage, {
+        margin: 1,
+        color: data.qrCodeColors,
+        width: 512,
+      });
+
+      const blob = await (await fetch(dataUrl)).blob();
+
+      await uploadBytes(eventGuestGroupQRCodesStorageRef, blob);
+
+      qrCodeImageUrl = await getDownloadURL(eventGuestGroupQRCodesStorageRef);
+    }
+
+    if (qrCodeImageUrl) {
+      await updateDoc(eventGuestGroupDoc, {
+        ...data,
+        qrCodeImageUrl,
+      });
+      return;
+    }
 
     await updateDoc(eventGuestGroupDoc, data);
   };

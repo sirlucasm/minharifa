@@ -27,9 +27,12 @@ export default function ShowGuestGroup({
   const handleUpdateEventGuestPrensence = useCallback(
     async (e: ChangeEvent<HTMLInputElement>, eventGuestId: string) => {
       try {
-        await eventService.updateEventGuest(eventGuestId, {
-          isPresentInTheEvent: e.target.checked,
-        });
+        await eventService.updateEventGuest(
+          { eventGuestId },
+          {
+            isPresentInTheEvent: e.target.checked,
+          }
+        );
         message.success("Convidado confirmado no evento");
       } catch (error: any) {
         message.error(error.message);

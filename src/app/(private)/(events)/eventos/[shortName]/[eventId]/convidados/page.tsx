@@ -40,6 +40,7 @@ import eventService from "@/services/event";
 import { message } from "antd";
 import useAuth from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import EditGuestGroupModal from "./components/EditGuestGroupModal";
 
 interface ListEventGuestsProps {
   params: {
@@ -55,6 +56,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
 
   const [guests, setGuests] = useState<IEventGuest[]>([]);
   const [guestGroups, setGuestGroups] = useState<IEventGuestGroup[]>([]);
+  const [eventGroupGuests, setEventGroupGuests] = useState<IEventGuest[]>([]);
   const [selectedGuest, setSelectedGuest] = useState<IEventGuest | undefined>();
   const [selectedGuestGroup, setSelectedGuestGroup] = useState<
     IEventGuestGroup | undefined
@@ -70,6 +72,11 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
     showConfirmGuestGroupDeleteDialog,
     setShowConfirmGuestGroupDeleteDialog,
   ] = useState(false);
+  const [showEditGuestGroupModal, setShowEditGuestGroupModal] = useState(false);
+
+  const handleOpenEditGuestGroupModal = useCallback(() => {
+    setShowEditGuestGroupModal((prev) => !prev);
+  }, []);
 
   const handleOpenGuestGroupAccordion = useCallback(
     (value: number) => {
@@ -161,6 +168,9 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
       );
 
       setGuestGroups(guestGroups as IEventGuestGroup[]);
+      setEventGroupGuests(
+        guestGroups.flatMap((guestGroup) => guestGroup.guests) as IEventGuest[]
+      );
     });
 
     return () => unsub();
@@ -290,7 +300,13 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
                     >
                       <MenuItem>Compartilhar para convidados</MenuItem>
                     </Link>
-                    <MenuItem className="outline-none hover:!outline-none">
+                    <MenuItem
+                      className="outline-none hover:!outline-none"
+                      onClick={() => {
+                        handleOpenEditGuestGroupModal();
+                        setSelectedGuestGroup(guestGroup);
+                      }}
+                    >
                       Editar
                     </MenuItem>
                     <MenuItem
@@ -395,6 +411,16 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
           </div>
         </div>
       </div>
+
+      <EditGuestGroupModal
+        open={showEditGuestGroupModal}
+        handler={handleOpenEditGuestGroupModal}
+        eventId={eventId}
+        guestGroup={selectedGuestGroup}
+        eventGroupGuests={eventGroupGuests}
+        shortName={shortName}
+      />
+
       <ConfirmDeleteDialog
         open={showConfirmGuestDeleteDialog}
         handler={() => handleOpenConfirmDeleteDialog("guest")}
