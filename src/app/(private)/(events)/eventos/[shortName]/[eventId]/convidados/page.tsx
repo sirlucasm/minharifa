@@ -28,6 +28,7 @@ import {
   DocumentData,
   collection,
   onSnapshot,
+  orderBy,
   query,
   where,
 } from "firebase/firestore";
@@ -127,7 +128,8 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
     const q = query(
       eventGuestsRef,
       where("eventId", "==", eventId),
-      where("isDeleted", "==", false)
+      where("isDeleted", "==", false),
+      orderBy("createdAt", "desc")
     );
     const unsub = onSnapshot(q, (snapshot) => {
       const guests: DocumentData[] = [];
@@ -144,7 +146,8 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
     const q = query(
       eventGuestGroupsRef,
       where("eventId", "==", eventId),
-      where("isDeleted", "==", false)
+      where("isDeleted", "==", false),
+      orderBy("createdAt", "desc")
     );
     const unsub = onSnapshot(q, (snapshot) => {
       const guestGroups: DocumentData[] = [];
