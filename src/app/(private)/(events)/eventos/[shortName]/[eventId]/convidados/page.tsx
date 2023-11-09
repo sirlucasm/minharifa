@@ -236,7 +236,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
               <Accordion
                 key={guestGroup.id}
                 open={openGuestGroupAccordion === i + 1}
-                className="bg-white shadow-md py-4 px-6 rounded-xl w-full sm:w-fit relative h-min"
+                className="bg-white shadow-md py-4 px-6 rounded-xl w-full sm:w-1/3 xl:w-1/4 relative h-min"
               >
                 <AccordionHeader
                   onClick={() => handleOpenGuestGroupAccordion(i + 1)}
@@ -288,7 +288,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
                       )}
                       className="outline-none hover:!outline-none"
                     >
-                      <MenuItem>Compartilhar para convidado</MenuItem>
+                      <MenuItem>Compartilhar para convidados</MenuItem>
                     </Link>
                     <MenuItem className="outline-none hover:!outline-none">
                       Editar
