@@ -1,6 +1,8 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 
 import { Wrapper } from "@/components/common/Wrapper";
 import Input from "@/components/common/Input";
@@ -18,22 +20,26 @@ import { CreateEventDto, IEventVisibility } from "@/@types/event.type";
 import { maskValueToCurrency } from "@/utils/currency";
 import useAuth from "@/hooks/useAuth";
 import eventService from "@/services/event";
-import Link from "next/link";
+import QRCode from "qrcode";
 
 export default function CreateEvent() {
   const router = useRouter();
   const { currentUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [previewQRCode, setPreviewQRCode] = useState<string>("");
 
   const {
     register,
     setValue,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<CreateEventDto>({
     resolver: useYupValidationResolver(createEventSchema),
     mode: "onChange",
   });
+
+  const qrCodeColors = watch("settings.qrCodeColors");
 
   const onSubmit: SubmitHandler<CreateEventDto> = useCallback(
     async (data, e) => {
@@ -55,6 +61,23 @@ export default function CreateEvent() {
     },
     [currentUser, router]
   );
+
+  const handleChangeQRCodeColorPreview = useCallback(async () => {
+    const dataUrl = await QRCode.toDataURL("QR Code Color Preview", {
+      margin: 1,
+      color: {
+        dark: qrCodeColors?.dark || "#09647d",
+        light: qrCodeColors?.light || "#ffffff",
+      },
+      width: 100,
+    });
+
+    setPreviewQRCode(dataUrl);
+  }, [qrCodeColors?.dark, qrCodeColors?.light]);
+
+  useEffect(() => {
+    handleChangeQRCodeColorPreview();
+  }, [handleChangeQRCodeColorPreview]);
 
   return (
     <Wrapper className="mt-3">
@@ -184,6 +207,38 @@ export default function CreateEvent() {
               </span>
             )}
           </div>
+        </div>
+
+        <div className="flex flex-col w-full gap-3">
+          <div>
+            <h3 className="text-md font-semibold text-gray-dark">
+              Cores QR Code
+            </h3>
+          </div>
+          <div className="w-full sm:w-[280px]">
+            <Input
+              {...register("settings.qrCodeColors.dark")}
+              label="Cor escura (opcional)"
+              defaultValue={"#09647d"}
+              type="color"
+            />
+          </div>
+          <div className="w-full sm:w-[280px]">
+            <Input
+              {...register("settings.qrCodeColors.light")}
+              label="Cor clara (opcional)"
+              defaultValue={"#ffffff"}
+              type="color"
+            />
+          </div>
+          {!!previewQRCode && (
+            <Image
+              src={previewQRCode}
+              alt="QR Code Color Preview"
+              width={100}
+              height={100}
+            />
+          )}
         </div>
 
         <Button className="self-start" type="submit" isLoading={isLoading}>

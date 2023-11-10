@@ -17,7 +17,7 @@ export const createEventSchema = yup.object({
   budgetValue: yup.string().required("Você deve informar o valor do orçamento"),
   startAt: yup.date().required("Você deve informar a data de inicio"),
   endAt: yup.date().when("startAt", (startAt, schema) => {
-    if (startAt) {
+    if (startAt.length > 0 && !isNaN(Date.parse(startAt[0]))) {
       return schema
         .min(
           startAt[0],
@@ -26,6 +26,12 @@ export const createEventSchema = yup.object({
         .required("Você deve informar a data de término");
     }
     return schema.required("Você deve informar a data de término");
+  }),
+  settings: yup.object({
+    qrCodeColors: yup.object({
+      light: yup.string().default("#ffffff"),
+      dark: yup.string().default("#09647d"),
+    }),
   }),
 });
 

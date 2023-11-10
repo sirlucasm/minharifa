@@ -32,6 +32,12 @@ export interface CreateEventDto {
   inviteUri: string;
   inviteCode: string;
   userId: string;
+  settings: {
+    qrCodeColors: {
+      light: string;
+      dark: string;
+    };
+  };
   isDeleted: boolean;
   startAt: Timestamp;
   endAt: Timestamp;
