@@ -13,7 +13,7 @@ export const convertNumberToCurrency = (value: number | undefined) => {
 };
 
 export const convertCurrencyToNumber = (currency: string) =>
-  Number(currency.replace("R$", "").trim().replace(",", "").replace(".", ""));
+  Number(currency.replace(/[ R$,.]/g, ""));
 
 export const maskValueToCurrency = (e: ChangeEvent<HTMLInputElement>) => {
   const rawValue = e.target.value;

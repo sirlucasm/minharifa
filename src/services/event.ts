@@ -41,6 +41,7 @@ const eventBudgetsRef = collection(db, "eventBudgets");
 
 class EventService {
   create = async (data: CreateEventDto) => {
+    debugger;
     const q = query(
       eventRef,
       where("shortName", "==", data.shortName),
