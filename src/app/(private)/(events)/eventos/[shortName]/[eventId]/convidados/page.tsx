@@ -35,12 +35,11 @@ import {
 import { db } from "@/configs/firebase";
 import { IEventGuest, IEventGuestGroup } from "@/@types/event.type";
 import Divider from "@/components/common/Divider";
+import EditGuestGroupModal from "./components/EditGuestGroupModal";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import eventService from "@/services/event";
 import { message } from "antd";
-import useAuth from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
-import EditGuestGroupModal from "./components/EditGuestGroupModal";
+import EditGuestModal from "./components/EditGuestModal";
 
 interface ListEventGuestsProps {
   params: {
@@ -51,8 +50,6 @@ interface ListEventGuestsProps {
 
 export default function ListEventGuests({ params }: ListEventGuestsProps) {
   const { eventId, shortName } = params;
-  const { currentUser } = useAuth();
-  const router = useRouter();
 
   const [guests, setGuests] = useState<IEventGuest[]>([]);
   const [guestGroups, setGuestGroups] = useState<IEventGuestGroup[]>([]);
@@ -73,6 +70,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
     setShowConfirmGuestGroupDeleteDialog,
   ] = useState(false);
   const [showEditGuestGroupModal, setShowEditGuestGroupModal] = useState(false);
+  const [showEditGuestModal, setShowEditGuestModal] = useState(false);
 
   const handleOpenEditGuestGroupModal = useCallback(() => {
     setShowEditGuestGroupModal(true);
@@ -81,6 +79,15 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
     setShowEditGuestGroupModal(false);
 
     setSelectedGuestGroup(undefined);
+  }, []);
+
+  const handleOpenEditGuestModal = useCallback(() => {
+    setShowEditGuestModal(true);
+  }, []);
+  const handleCloseEditGuestModal = useCallback(() => {
+    setShowEditGuestModal(false);
+
+    setSelectedGuest(undefined);
   }, []);
 
   const handleOpenGuestGroupAccordion = useCallback(
@@ -180,19 +187,6 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
 
     return () => unsub();
   }, [eventId, guests]);
-
-  console.log(eventGroupGuests);
-
-  useEffect(() => {
-    if (!currentUser) return;
-    (async function () {
-      const isUserOwnerEvent = await eventService.isEventUserOwner(
-        shortName,
-        currentUser.id
-      );
-      if (!isUserOwnerEvent) router.replace(routes.private.event.list);
-    })();
-  }, [currentUser, router, shortName]);
 
   return (
     <Wrapper className="mt-5 mb-10 w-full">
@@ -399,7 +393,13 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
                     >
                       <MenuItem>Compartilhar para convidado</MenuItem>
                     </Link>
-                    <MenuItem className="outline-none hover:!outline-none">
+                    <MenuItem
+                      className="outline-none hover:!outline-none"
+                      onClick={() => {
+                        handleOpenEditGuestModal();
+                        setSelectedGuest(guest);
+                      }}
+                    >
                       Editar
                     </MenuItem>
                     <MenuItem
@@ -426,6 +426,16 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
           eventId={eventId}
           guestGroup={selectedGuestGroup}
           eventGroupGuests={eventGroupGuests}
+          shortName={shortName}
+        />
+      )}
+
+      {selectedGuest && (
+        <EditGuestModal
+          open={showEditGuestModal}
+          handleCancel={handleCloseEditGuestModal}
+          eventId={eventId}
+          guest={selectedGuest}
           shortName={shortName}
         />
       )}
