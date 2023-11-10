@@ -53,7 +53,6 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
 
   const [guests, setGuests] = useState<IEventGuest[]>([]);
   const [guestGroups, setGuestGroups] = useState<IEventGuestGroup[]>([]);
-  const [eventGroupGuests, setEventGroupGuests] = useState<IEventGuest[]>([]);
   const [selectedGuest, setSelectedGuest] = useState<IEventGuest | undefined>();
   const [selectedGuestGroup, setSelectedGuestGroup] = useState<
     IEventGuestGroup | undefined
@@ -180,9 +179,6 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
       );
 
       setGuestGroups(guestGroups as IEventGuestGroup[]);
-      setEventGroupGuests(
-        guestGroups.map((guestGroup) => guestGroup.guests)[0] as IEventGuest[]
-      );
     });
 
     return () => unsub();
@@ -419,13 +415,12 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
         </div>
       </div>
 
-      {!!eventGroupGuests.length && selectedGuestGroup && (
+      {selectedGuestGroup && (
         <EditGuestGroupModal
           open={showEditGuestGroupModal}
           handleCancel={handleCloseEditGuestGroupModal}
           eventId={eventId}
           guestGroup={selectedGuestGroup}
-          eventGroupGuests={eventGroupGuests}
           shortName={shortName}
         />
       )}

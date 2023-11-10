@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 
 import { Checkbox, DialogBody, DialogHeader } from "@material-tailwind/react";
@@ -12,7 +12,6 @@ import useYupValidationResolver from "@/hooks/useYupValidationResolver";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   CreateEventGuestGroupDto,
-  IEventGuest,
   IEventGuestGroup,
 } from "@/@types/event.type";
 import { createEventGuestGroupSchema } from "@/schemas/event";
@@ -23,7 +22,6 @@ interface CreateGuestGroupModalProps {
   open: boolean;
   handleCancel: () => void;
   guestGroup: IEventGuestGroup | undefined;
-  eventGroupGuests: IEventGuest[];
   eventId: string;
   shortName: string;
 }
@@ -34,11 +32,12 @@ export default function EditGuestGroupModal({
   eventId,
   shortName,
   guestGroup,
-  eventGroupGuests,
 }: CreateGuestGroupModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [previewQRCode, setPreviewQRCode] = useState<string>("");
-  const [guests, setGuests] = useState(eventGroupGuests);
+  const [guests, setGuests] = useState(
+    useMemo(() => guestGroup?.guests || [], [guestGroup])
+  );
 
   const {
     handleSubmit,
