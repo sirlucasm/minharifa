@@ -1,15 +1,12 @@
+"use client";
+
 import { useCallback, useState, useEffect } from "react";
 import Image from "next/image";
 
-import {
-  Checkbox,
-  Dialog,
-  DialogBody,
-  DialogHeader,
-} from "@material-tailwind/react";
+import { Checkbox, DialogBody, DialogHeader } from "@material-tailwind/react";
 import Input from "@/components/common/Input";
 import Button from "@/components/common/Button";
-import { message } from "antd";
+import { Modal, message } from "antd";
 
 import useYupValidationResolver from "@/hooks/useYupValidationResolver";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -19,14 +16,12 @@ import {
   IEventGuestGroup,
 } from "@/@types/event.type";
 import { createEventGuestGroupSchema } from "@/schemas/event";
-import { useRouter } from "next/navigation";
 import eventService from "@/services/event";
-import routes from "@/routes";
 import QRCode from "qrcode";
 
 interface CreateGuestGroupModalProps {
   open: boolean;
-  handler: () => void;
+  handleCancel: () => void;
   guestGroup: IEventGuestGroup | undefined;
   eventGroupGuests: IEventGuest[];
   eventId: string;
@@ -34,17 +29,16 @@ interface CreateGuestGroupModalProps {
 }
 
 export default function EditGuestGroupModal({
-  handler,
+  handleCancel,
   open,
   eventId,
   shortName,
   guestGroup,
   eventGroupGuests,
 }: CreateGuestGroupModalProps) {
-  const router = useRouter();
-
   const [isLoading, setIsLoading] = useState(false);
   const [previewQRCode, setPreviewQRCode] = useState<string>("");
+  const [guests, setGuests] = useState(eventGroupGuests);
 
   const {
     handleSubmit,
@@ -64,7 +58,7 @@ export default function EditGuestGroupModal({
 
       setIsLoading(true);
       try {
-        data.guestIds = eventGroupGuests.map((guest) => guest.id);
+        data.guestIds = guests.map((guest) => guest.id);
         await eventService.updateEventGuestGroup(
           { eventGuestGroupId: guestGroup.id, eventShortName: shortName },
           {
@@ -73,7 +67,7 @@ export default function EditGuestGroupModal({
           }
         );
         message.success("Grupo atualizado com sucesso");
-        router.push(routes.private.eventGuests.list(shortName, eventId));
+        handleCancel();
       } catch (error) {
         console.log(error);
         message.error("Falha interna ao atualizar grupo");
@@ -81,11 +75,17 @@ export default function EditGuestGroupModal({
         setIsLoading(false);
       }
     },
-    [guestGroup, eventId, eventGroupGuests, router, shortName]
+    [guestGroup, eventId, guests, shortName, handleCancel]
   );
 
   const handleChangeQRCodeColorPreview = useCallback(async () => {
-    if (!qrCodeColors?.dark || !qrCodeColors?.light) return;
+    if (!qrCodeColors?.dark || !qrCodeColors?.light) {
+      if (guestGroup?.qrCodeImageUrl) {
+        setPreviewQRCode(guestGroup.qrCodeImageUrl);
+        return;
+      }
+      return;
+    }
     const dataUrl = await QRCode.toDataURL("QR Code Color Preview", {
       margin: 1,
       color: {
@@ -96,24 +96,30 @@ export default function EditGuestGroupModal({
     });
 
     setPreviewQRCode(dataUrl);
-  }, [qrCodeColors?.dark, qrCodeColors?.light]);
+  }, [guestGroup?.qrCodeImageUrl, qrCodeColors?.dark, qrCodeColors?.light]);
 
   useEffect(() => {
     handleChangeQRCodeColorPreview();
   }, [handleChangeQRCodeColorPreview]);
 
   return (
-    <Dialog open={open} handler={handler} size="xs">
+    <Modal open={open} onCancel={handleCancel} footer="">
       <DialogHeader>Editar grupo</DialogHeader>
       <DialogBody className="pt-0">
         <h2 className="text-md font-semibold text-gray-dark">Pessoas:</h2>
-        {eventGroupGuests.map((guest, i) => (
+        {guests.map((guest, i) => (
           <div key={i} className="flex flex-row items-center gap-2">
             <span className="text-sm text-gray-dark">
               {`${i + 1}. ` + guest.name}
             </span>
-            {eventGroupGuests.length > 2 && (
-              <Button colorVariant="ghost" className="px-3 py-0 text-xs text-">
+            {guests.length > 2 && (
+              <Button
+                colorVariant="ghost"
+                className="px-3 py-0 text-xs text-"
+                onClick={() => {
+                  setGuests((prev) => prev.filter((g) => g.id !== guest.id));
+                }}
+              >
                 remover
               </Button>
             )}
@@ -177,6 +183,6 @@ export default function EditGuestGroupModal({
           </Button>
         </form>
       </DialogBody>
-    </Dialog>
+    </Modal>
   );
 }

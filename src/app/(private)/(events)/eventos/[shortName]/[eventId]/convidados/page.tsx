@@ -75,7 +75,12 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
   const [showEditGuestGroupModal, setShowEditGuestGroupModal] = useState(false);
 
   const handleOpenEditGuestGroupModal = useCallback(() => {
-    setShowEditGuestGroupModal((prev) => !prev);
+    setShowEditGuestGroupModal(true);
+  }, []);
+  const handleCloseEditGuestGroupModal = useCallback(() => {
+    setShowEditGuestGroupModal(false);
+
+    setSelectedGuestGroup(undefined);
   }, []);
 
   const handleOpenGuestGroupAccordion = useCallback(
@@ -169,12 +174,14 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
 
       setGuestGroups(guestGroups as IEventGuestGroup[]);
       setEventGroupGuests(
-        guestGroups.flatMap((guestGroup) => guestGroup.guests) as IEventGuest[]
+        guestGroups.map((guestGroup) => guestGroup.guests)[0] as IEventGuest[]
       );
     });
 
     return () => unsub();
   }, [eventId, guests]);
+
+  console.log(eventGroupGuests);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -412,14 +419,16 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
         </div>
       </div>
 
-      <EditGuestGroupModal
-        open={showEditGuestGroupModal}
-        handler={handleOpenEditGuestGroupModal}
-        eventId={eventId}
-        guestGroup={selectedGuestGroup}
-        eventGroupGuests={eventGroupGuests}
-        shortName={shortName}
-      />
+      {!!eventGroupGuests.length && selectedGuestGroup && (
+        <EditGuestGroupModal
+          open={showEditGuestGroupModal}
+          handleCancel={handleCloseEditGuestGroupModal}
+          eventId={eventId}
+          guestGroup={selectedGuestGroup}
+          eventGroupGuests={eventGroupGuests}
+          shortName={shortName}
+        />
+      )}
 
       <ConfirmDeleteDialog
         open={showConfirmGuestDeleteDialog}
