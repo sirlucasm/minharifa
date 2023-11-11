@@ -17,6 +17,12 @@ export interface IEvent {
   endAt: Timestamp;
   sharedUsers: string[];
   participants: IUser[];
+  settings: {
+    qrCodeColors: {
+      light: string;
+      dark: string;
+    };
+  };
   updatedAt: Timestamp;
   createdAt: Timestamp;
   deletedAt: Timestamp;

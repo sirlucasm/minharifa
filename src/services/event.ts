@@ -143,6 +143,18 @@ class EventService {
     return event;
   };
 
+  updateEvent = async (eventId: string, data: Partial<IEvent>) => {
+    const eventDoc = doc(eventRef, eventId);
+
+    updateDoc(eventDoc, {
+      ...data,
+      budgetValue: convertCurrencyToNumber(
+        data.budgetValue as unknown as string
+      ),
+      updatedAt: new Date(),
+    });
+  };
+
   getByShortName = async (shortName: string) => {
     const q = query(
       eventRef,
