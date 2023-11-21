@@ -13,7 +13,7 @@ import { message } from "antd";
 
 import { SubmitHandler, useForm } from "react-hook-form";
 import useYupValidationResolver from "@/hooks/useYupValidationResolver";
-import { CreateEventGuestDto, IEventGuest } from "@/@types/event.type";
+import { CreateEventGuestDto, IEvent, IEventGuest } from "@/@types/event.type";
 import { createEventGuestSchema } from "@/schemas/event";
 import eventService from "@/services/event";
 import {
@@ -25,6 +25,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/configs/firebase";
 import QRCode from "qrcode";
+import useAuth from "@/hooks/useAuth";
 
 interface CreateEventGuestsProps {
   params: {
@@ -36,11 +37,14 @@ interface CreateEventGuestsProps {
 export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
   const { eventId, shortName } = params;
 
+  const { currentUser } = useAuth();
+
   const [isLoading, setIsLoading] = useState(false);
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
 
   const [recentSavedGuests, setRecentSavedGuests] = useState<IEventGuest[]>([]);
   const [previewQRCode, setPreviewQRCode] = useState<string>("");
+  const [event, setEvent] = useState<IEvent | undefined>();
 
   const now = useMemo(() => new Date(), []);
 
@@ -66,7 +70,9 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
           eventId,
         });
         message.success("Convidado adicionado com sucesso");
-        reset();
+        reset({
+          qrCodeColors: event?.settings.qrCodeColors,
+        });
       } catch (error: any) {
         console.log(error);
         message.error("Falha interna ao adicionar convidado");
@@ -74,7 +80,7 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
         setIsLoading(false);
       }
     },
-    [eventId, reset, shortName]
+    [event, eventId, reset, shortName]
   );
 
   const handleOpenCreateGroupModal = useCallback(() => {
@@ -94,6 +100,19 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
 
     setPreviewQRCode(dataUrl);
   }, [qrCodeColors?.dark, qrCodeColors?.light]);
+
+  const fetchEvent = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      const response = await eventService.get(shortName, currentUser.id);
+      setEvent(response);
+      reset({
+        qrCodeColors: response?.settings.qrCodeColors,
+      });
+    } catch (error: any) {
+      message.error(error.message);
+    }
+  }, [currentUser, reset, shortName]);
 
   useEffect(() => {
     if (!eventId) return;
@@ -116,6 +135,10 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
   useEffect(() => {
     handleChangeQRCodeColorPreview();
   }, [handleChangeQRCodeColorPreview]);
+
+  useEffect(() => {
+    fetchEvent();
+  }, [fetchEvent]);
 
   return (
     <Wrapper className="mt-5 mb-10 w-full">
@@ -201,7 +224,7 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
                 {...register("qrCodeColors.dark")}
                 error={!!errors.email?.message}
                 label="Cor escura (opcional)"
-                defaultValue="#09647d"
+                defaultValue={event?.settings.qrCodeColors.dark || "#09647d"}
                 type="color"
               />
             </div>
@@ -210,7 +233,7 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
                 {...register("qrCodeColors.light")}
                 error={!!errors.email?.message}
                 label="Cor clara (opcional)"
-                defaultValue="#ffffff"
+                defaultValue={event?.settings.qrCodeColors.light || "#ffffff"}
                 type="color"
               />
             </div>

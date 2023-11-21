@@ -204,7 +204,16 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
         </Link>
       </Breadcrumbs>
       <div>
-        <div className="mt-5">
+        <div className="mt-5 flex flex-col xs:flex-row items-center gap-2">
+          <Link
+            href={routes.private.eventGuests.create(shortName, eventId || "")}
+            className="bg-white shadow-md p-2 w-32 flex flex-col items-center rounded-xl hover:shadow-lg transition-shadow duration-300"
+          >
+            <Image src={PlusIcon} alt="Plus icon" className="w-7" />
+            <span className="text-sm text-gray font-semibold text-center">
+              Adicionar
+            </span>
+          </Link>
           <Link
             href={routes.private.eventGuests.createGroup(shortName, eventId)}
             className="bg-white shadow-md p-2 w-32 flex flex-col items-center rounded-xl hover:shadow-lg transition-shadow duration-300"

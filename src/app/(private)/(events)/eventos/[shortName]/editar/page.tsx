@@ -102,7 +102,7 @@ export default function EditEvent({ params }: EditEventProps) {
       });
     } catch (error: any) {
       message.error(error.message);
-      router.replace(routes.private.raffle.list);
+      router.replace(routes.private.event.list);
     } finally {
       setIsLoadingEvent(false);
     }

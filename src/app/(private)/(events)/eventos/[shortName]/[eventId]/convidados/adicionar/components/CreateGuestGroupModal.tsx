@@ -13,12 +13,17 @@ import { message } from "antd";
 
 import useYupValidationResolver from "@/hooks/useYupValidationResolver";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { CreateEventGuestGroupDto, IEventGuest } from "@/@types/event.type";
+import {
+  CreateEventGuestGroupDto,
+  IEvent,
+  IEventGuest,
+} from "@/@types/event.type";
 import { createEventGuestGroupSchema } from "@/schemas/event";
 import { useRouter } from "next/navigation";
 import eventService from "@/services/event";
 import routes from "@/routes";
 import QRCode from "qrcode";
+import useAuth from "@/hooks/useAuth";
 
 interface CreateGuestGroupModalProps {
   open: boolean;
@@ -36,15 +41,18 @@ export default function CreateGuestGroupModal({
   shortName,
 }: CreateGuestGroupModalProps) {
   const router = useRouter();
+  const { currentUser } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [previewQRCode, setPreviewQRCode] = useState<string>("");
+  const [event, setEvent] = useState<IEvent | undefined>();
 
   const {
     handleSubmit,
     register,
     formState: { errors },
     watch,
+    reset,
   } = useForm<CreateEventGuestGroupDto>({
     resolver: useYupValidationResolver(createEventGuestGroupSchema),
     mode: "onChange",
@@ -87,9 +95,26 @@ export default function CreateGuestGroupModal({
     setPreviewQRCode(dataUrl);
   }, [qrCodeColors?.dark, qrCodeColors?.light]);
 
+  const fetchEvent = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      const response = await eventService.get(shortName, currentUser.id);
+      setEvent(response);
+      reset({
+        qrCodeColors: response?.settings.qrCodeColors,
+      });
+    } catch (error: any) {
+      message.error(error.message);
+    }
+  }, [currentUser, reset, shortName]);
+
   useEffect(() => {
     handleChangeQRCodeColorPreview();
   }, [handleChangeQRCodeColorPreview]);
+
+  useEffect(() => {
+    fetchEvent();
+  }, [fetchEvent]);
 
   return (
     <Dialog open={open} handler={handler} size="xs">
@@ -126,7 +151,7 @@ export default function CreateGuestGroupModal({
             <Input
               {...register("qrCodeColors.dark")}
               label="Cor escura (opcional)"
-              defaultValue="#09647d"
+              defaultValue={event?.settings.qrCodeColors.dark || "#09647d"}
               type="color"
             />
           </div>
@@ -134,7 +159,7 @@ export default function CreateGuestGroupModal({
             <Input
               {...register("qrCodeColors.light")}
               label="Cor clara (opcional)"
-              defaultValue="#ffffff"
+              defaultValue={event?.settings.qrCodeColors.light || "#ffffff"}
               type="color"
             />
           </div>
