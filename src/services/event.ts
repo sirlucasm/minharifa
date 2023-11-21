@@ -264,6 +264,16 @@ class EventService {
     });
   };
 
+  deleteBudget = async (budgetId: string) => {
+    const eventBudgetDoc = doc(eventBudgetsRef, budgetId);
+
+    await updateDoc(eventBudgetDoc, {
+      isDeleted: true,
+      deletedAt: new Date(),
+      updatedAt: new Date(),
+    });
+  };
+
   addEventGuest = async (eventShortName: string, data: CreateEventGuestDto) => {
     const eventGuestDoc = doc(eventGuestsRef);
     const eventGuestQRCodesStorageRef = ref(

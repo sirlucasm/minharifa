@@ -28,6 +28,7 @@ import Button from "@/components/common/Button";
 import MenuDotHorizontalIcon from "@/assets/icons/menu-dot-horizontal.svg?url";
 import PlusIcon from "@/assets/icons/plus.svg?url";
 import PencilIcon from "@/assets/icons/pencil.svg?url";
+import DeleteIcon from "@/assets/icons/delete.svg?url";
 import GroupPeopleIcon from "@/assets/icons/group-people.svg?url";
 
 import routes from "@/routes";
@@ -75,6 +76,8 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
 
   const [showConfirmEventDeleteDialog, setShowConfirmEventDeleteDialog] =
     useState(false);
+  const [showConfirmBudgetDeleteDialog, setShowConfirmBudgetDeleteDialog] =
+    useState(false);
   const [showCreateEventBudgetModal, setShowCreateEventBudgetModal] =
     useState(false);
   const [showMoneyProgress, setShowMoneyProgress] = useState(
@@ -116,7 +119,7 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
     setIsLoadingDeleteEvent(true);
     try {
       await eventService.delete(event.id);
-      message.success("A Rifa foi excluída com sucesso");
+      message.success("O evento foi excluído com sucesso");
       router.replace(routes.private.event.list);
     } catch (error: any) {
       message.error(error.message);
@@ -128,6 +131,10 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
   const handleOpenConfirmEventDeleteDialog = useCallback(() => {
     setShowConfirmEventDeleteDialog(!showConfirmEventDeleteDialog);
   }, [showConfirmEventDeleteDialog, setShowConfirmEventDeleteDialog]);
+
+  const handleOpenConfirmBudgetDeleteDialog = useCallback(() => {
+    setShowConfirmBudgetDeleteDialog(!showConfirmBudgetDeleteDialog);
+  }, [showConfirmBudgetDeleteDialog, setShowConfirmBudgetDeleteDialog]);
 
   const handleOpenCreateEventBudgetModal = useCallback(() => {
     setShowCreateEventBudgetModal(!showCreateEventBudgetModal);
@@ -190,6 +197,20 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
     },
     [handleOpenInvitesModal]
   );
+
+  const handleDeleteBudget = useCallback(async () => {
+    if (!selectedEventBudget) return;
+    setIsLoadingDeleteEvent(true);
+    try {
+      await eventService.deleteBudget(selectedEventBudget.id);
+      message.success("O item de orçamento foi excluído com sucesso");
+      handleOpenConfirmBudgetDeleteDialog();
+    } catch (error: any) {
+      message.error(error.message);
+    } finally {
+      setIsLoadingDeleteEvent(false);
+    }
+  }, [handleOpenConfirmBudgetDeleteDialog, selectedEventBudget]);
 
   useEffect(() => {
     if (!event) return;
@@ -377,6 +398,20 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
                               className="w-12"
                             />
                           </IconButton>
+                          <IconButton
+                            className=""
+                            variant="text"
+                            onClick={() => {
+                              handleOpenConfirmBudgetDeleteDialog();
+                              setSelectedEventBudget(budget);
+                            }}
+                          >
+                            <Image
+                              src={DeleteIcon}
+                              alt="Delete icon"
+                              className="w-12"
+                            />
+                          </IconButton>
                         </ListItemSuffix>
                       </ListItem>
                     ))}
@@ -492,6 +527,27 @@ export default function ShowEvent({ params, searchParams }: ShowEventProps) {
           </Button>
         </DialogFooter>
       </Dialog>
+
+      <Dialog
+        open={showConfirmBudgetDeleteDialog}
+        handler={handleOpenConfirmBudgetDeleteDialog}
+      >
+        <DialogHeader>Excluir orçamento</DialogHeader>
+        <DialogBody>
+          Tem certeza que deseja excluir este item de orçamento?
+        </DialogBody>
+        <DialogFooter className="space-x-2">
+          <Button onClick={handleOpenConfirmBudgetDeleteDialog}>Não</Button>
+          <Button
+            colorVariant="outlined"
+            isLoading={isLoadingDeleteEvent}
+            onClick={handleDeleteBudget}
+          >
+            Sim
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
       <CreateOrEditEventBudgetModal
         open={showCreateEventBudgetModal}
         handler={handleOpenCreateEventBudgetModal}
