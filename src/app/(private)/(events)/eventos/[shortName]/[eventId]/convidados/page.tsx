@@ -124,6 +124,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
       message.error("Falha ao remover convidado");
     } finally {
       setIsLoadingRemoveGuest(false);
+      setShowConfirmGuestDeleteDialog(false);
     }
   }, [selectedGuest]);
 
@@ -131,12 +132,13 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
     if (!selectedGuestGroup) return;
     setIsLoadingRemoveGuestGroup(true);
     try {
-      await eventService.removeEventGuest(selectedGuestGroup.id);
+      await eventService.removeEventGuestGroup(selectedGuestGroup.id);
       message.success("Grupo/familia removida com sucesso");
     } catch (error) {
       message.error("Falha ao remover grupo/familia");
     } finally {
       setIsLoadingRemoveGuestGroup(false);
+      setShowConfirmGuestGroupDeleteDialog(false);
     }
   }, [selectedGuestGroup]);
 
