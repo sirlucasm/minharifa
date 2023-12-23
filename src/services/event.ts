@@ -394,7 +394,7 @@ class EventService {
     );
     const eventAdminQRRedirectPage = `${
       process.env.NEXT_PUBLIC_APP_URL
-    }${routes.public.eventGuests.shareQRCode(
+    }${routes.public.eventGuestGroups.shareQRCode(
       eventShortName,
       data.eventId,
       eventGuestGroupDoc.id
@@ -483,7 +483,7 @@ class EventService {
       );
       const eventAdminQRRedirectPage = `${
         process.env.NEXT_PUBLIC_APP_URL
-      }${routes.public.eventGuests.shareQRCode(
+      }${routes.public.eventGuestGroups.shareQRCode(
         eventShortName,
         data.eventId as string,
         eventGuestGroupDoc.id
