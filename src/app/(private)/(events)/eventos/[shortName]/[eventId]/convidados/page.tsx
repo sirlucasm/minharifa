@@ -227,7 +227,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
           </Link>
         </div>
 
-        <div className="mt-5 flex flex-col items-center sm:items-stretch text-center gap-2 sm:flex-row justify-between bg-white rounded-xl shadow-md sm:w-[480px] p-6 relative">
+        <div className="mt-5 flex flex-col items-center sm:items-stretch text-center gap-2 sm:flex-row justify-between bg-white rounded-xl shadow-md p-6 relative">
           <div>
             <h3 className="text-sm text-gray">N° de convidados</h3>
             <span className="text-md font-bold text-gray">{guests.length}</span>
@@ -237,6 +237,13 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
             <h3 className="text-sm text-gray">N° de grupos</h3>
             <span className="text-md font-bold text-gray">
               {guestGroups.length}
+            </span>
+          </div>
+          <Divider direction="vertical" />
+          <div>
+            <h3 className="text-sm text-gray">Não pagantes</h3>
+            <span className="text-md font-bold text-gray">
+              {guests.filter((guest) => guest.isNonPaying).length}
             </span>
           </div>
           <Divider direction="vertical" />

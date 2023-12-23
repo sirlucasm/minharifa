@@ -84,6 +84,7 @@ export interface IEventGuest {
     dark: string;
     light: string;
   };
+  isNonPaying: boolean;
   createdAt: Timestamp;
   deletedAt: Timestamp;
   isDeleted: boolean;
@@ -96,6 +97,7 @@ export interface CreateEventGuestDto {
   eventId: string;
   isPresentInTheEvent: boolean;
   isPresenceConfirmed: boolean;
+  isNonPaying: boolean;
   isDeleted: boolean;
   qrCodeImageUrl: string;
   qrCodeColors: {

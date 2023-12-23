@@ -48,6 +48,7 @@ export const createEventGuestSchema = yup.object({
     light: yup.string().default("#ffffff"),
     dark: yup.string().default("#09647d"),
   }),
+  isNonPaying: yup.boolean().default(false),
 });
 
 export const createEventGuestGroupSchema = yup.object({

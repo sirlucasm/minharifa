@@ -5,7 +5,7 @@ import Image from "next/image";
 import routes from "@/routes";
 
 import { Wrapper } from "@/components/common/Wrapper";
-import { Breadcrumbs } from "@material-tailwind/react";
+import { Breadcrumbs, Checkbox } from "@material-tailwind/react";
 import Input from "@/components/common/Input";
 import Button from "@/components/common/Button";
 import CreateGuestGroupModal from "./components/CreateGuestGroupModal";
@@ -71,7 +71,10 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
         });
         message.success("Convidado adicionado com sucesso");
         reset({
-          qrCodeColors: event?.settings.qrCodeColors,
+          qrCodeColors: event?.settings?.qrCodeColors || {
+            dark: "#09647d",
+            light: "#ffffff",
+          },
         });
       } catch (error: any) {
         console.log(error);
@@ -107,7 +110,10 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
       const response = await eventService.get(shortName, currentUser.id);
       setEvent(response);
       reset({
-        qrCodeColors: response?.settings.qrCodeColors,
+        qrCodeColors: response?.settings?.qrCodeColors || {
+          dark: "#09647d",
+          light: "#ffffff",
+        },
       });
     } catch (error: any) {
       message.error(error.message);
@@ -213,6 +219,15 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
               )}
             </div>
           </div>
+          
+          <div>
+            <Checkbox
+              {...register("isNonPaying")}
+              crossOrigin=""
+              label="Não pagante"
+              color="blue-gray"
+            />
+          </div>
 
           <div>
             <h3 className="text-md font-semibold">Cores QR Code</h3>
@@ -224,7 +239,7 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
                 {...register("qrCodeColors.dark")}
                 error={!!errors.email?.message}
                 label="Cor escura (opcional)"
-                defaultValue={event?.settings.qrCodeColors.dark || "#09647d"}
+                defaultValue={event?.settings?.qrCodeColors.dark || "#09647d"}
                 type="color"
               />
             </div>
@@ -233,7 +248,7 @@ export default function CreateEventGuests({ params }: CreateEventGuestsProps) {
                 {...register("qrCodeColors.light")}
                 error={!!errors.email?.message}
                 label="Cor clara (opcional)"
-                defaultValue={event?.settings.qrCodeColors.light || "#ffffff"}
+                defaultValue={event?.settings?.qrCodeColors.light || "#ffffff"}
                 type="color"
               />
             </div>

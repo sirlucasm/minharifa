@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
-import { DialogBody, DialogHeader } from "@material-tailwind/react";
+import { Checkbox, DialogBody, DialogHeader } from "@material-tailwind/react";
 import Input from "@/components/common/Input";
 import Button from "@/components/common/Button";
 import { Modal, message } from "antd";
@@ -143,6 +143,17 @@ export default function EditGuestModal({
               )}
             </div>
           </div>
+
+          <div>
+            <Checkbox
+              {...register("isNonPaying")}
+              crossOrigin=""
+              label="Não pagante"
+              color="blue-gray"
+              defaultChecked={guest?.isNonPaying}
+            />
+          </div>
+
           <div>
             <h3 className="text-md font-semibold text-gray-dark">
               Cores QR Code

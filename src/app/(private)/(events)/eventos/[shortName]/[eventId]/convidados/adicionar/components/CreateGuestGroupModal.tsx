@@ -101,7 +101,7 @@ export default function CreateGuestGroupModal({
       const response = await eventService.get(shortName, currentUser.id);
       setEvent(response);
       reset({
-        qrCodeColors: response?.settings.qrCodeColors,
+        qrCodeColors: response?.settings?.qrCodeColors,
       });
     } catch (error: any) {
       message.error(error.message);
@@ -151,7 +151,7 @@ export default function CreateGuestGroupModal({
             <Input
               {...register("qrCodeColors.dark")}
               label="Cor escura (opcional)"
-              defaultValue={event?.settings.qrCodeColors.dark || "#09647d"}
+              defaultValue={event?.settings?.qrCodeColors.dark || "#09647d"}
               type="color"
             />
           </div>
@@ -159,7 +159,7 @@ export default function CreateGuestGroupModal({
             <Input
               {...register("qrCodeColors.light")}
               label="Cor clara (opcional)"
-              defaultValue={event?.settings.qrCodeColors.light || "#ffffff"}
+              defaultValue={event?.settings?.qrCodeColors.light || "#ffffff"}
               type="color"
             />
           </div>
