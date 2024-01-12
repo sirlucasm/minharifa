@@ -40,6 +40,7 @@ import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import eventService from "@/services/event";
 import { message } from "antd";
 import EditGuestModal from "./components/EditGuestModal";
+import Input from "@/components/common/Input";
 
 interface ListEventGuestsProps {
   params: {
@@ -52,7 +53,11 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
   const { eventId, shortName } = params;
 
   const [guests, setGuests] = useState<IEventGuest[]>([]);
+  const [searchedGuests, setSearchedGuests] = useState<IEventGuest[]>([]);
   const [guestGroups, setGuestGroups] = useState<IEventGuestGroup[]>([]);
+  const [searchedGuestGroups, setSearchedGuestGroups] = useState<
+    IEventGuestGroup[]
+  >([]);
   const [selectedGuest, setSelectedGuest] = useState<IEventGuest | undefined>();
   const [selectedGuestGroup, setSelectedGuestGroup] = useState<
     IEventGuestGroup | undefined
@@ -142,6 +147,32 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
     }
   }, [selectedGuestGroup]);
 
+  const onSearchGuest = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const searchText = e.target.value;
+
+      if (searchText.length < 3) {
+        if (searchText.length === 0) {
+          setSearchedGuests(guests);
+          setSearchedGuestGroups(guestGroups);
+        }
+        return;
+      }
+
+      setSearchedGuestGroups(
+        guestGroups.filter(
+          (guestGroup) =>
+            guestGroup.name.includes(searchText) ||
+            guestGroup.guests.some((guest) => guest.name.includes(searchText))
+        )
+      );
+      setSearchedGuests(
+        guests.filter((guest) => guest.name.includes(searchText))
+      );
+    },
+    [guestGroups, guests]
+  );
+
   useEffect(() => {
     if (!eventId) return;
     const eventGuestsRef = collection(db, "eventGuests");
@@ -155,6 +186,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
       const guests: DocumentData[] = [];
       snapshot.forEach(async (response) => guests.push(response.data()));
       setGuests(guests as IEventGuest[]);
+      setSearchedGuests(guests as IEventGuest[]);
     });
 
     return () => unsub();
@@ -181,6 +213,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
       );
 
       setGuestGroups(guestGroups as IEventGuestGroup[]);
+      setSearchedGuestGroups(guestGroups as IEventGuestGroup[]);
     });
 
     return () => unsub();
@@ -255,9 +288,19 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
           </div>
         </div>
 
+        <div className="mt-5 md:w-[400px]">
+          <Input label="Encontrar convidado/grupo" onChange={onSearchGuest} />
+        </div>
+
+        {!searchedGuests.length && !searchedGuestGroups.length && (
+          <div className="mt-10">
+            <span className="text-gray-dark text-md">Não encontramos nada</span>
+          </div>
+        )}
+
         <div className="flex gap-8 flex-col mt-5">
           <div className="flex flex-wrap gap-2">
-            {guestGroups.map((guestGroup, i) => (
+            {searchedGuestGroups.map((guestGroup, i) => (
               <Accordion
                 key={guestGroup.id}
                 open={openGuestGroupAccordion === i + 1}
@@ -339,7 +382,7 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
             ))}
           </div>
           <div className="flex flex-col gap-2">
-            {guests.map((guest, i) => (
+            {searchedGuests.map((guest, i) => (
               <div
                 className="bg-white shadow-md py-4 px-6 rounded-xl relative flex items-center justify-between"
                 key={guest.id}
