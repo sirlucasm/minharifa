@@ -1,3 +1,5 @@
+"use client";
+
 import { ChangeEvent, useCallback } from "react";
 import Image from "next/image";
 
@@ -9,14 +11,24 @@ import ExclamationIcon from "@/assets/icons/exclamation.svg?url";
 import eventService from "@/services/event";
 import { IEventGuestGroup } from "@/@types/event.type";
 import { Checkbox } from "@material-tailwind/react";
+import useAuth from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import routes from "@/routes";
 
 interface ShowGuestGroupQRCodeProps {
   guestGroup: IEventGuestGroup | undefined;
+  shortName: string;
+  eventGuestGroupId: string | undefined;
 }
 
 export default function ShowGuestGroupQRCode({
   guestGroup,
+  shortName,
+  eventGuestGroupId,
 }: ShowGuestGroupQRCodeProps) {
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
+
   const handleDownloadQRCode = useCallback(async () => {
     if (!guestGroup?.qrCodeImageUrl) return;
     const blob = await (await fetch(guestGroup?.qrCodeImageUrl)).blob();
@@ -49,6 +61,18 @@ export default function ShowGuestGroupQRCode({
     []
   );
 
+  const handleConfirmEventPresence = useCallback(() => {
+    if (!guestGroup) return;
+    if (!eventGuestGroupId) return;
+    router.push(
+      routes.private.eventGuestGroups.show(
+        shortName,
+        guestGroup.eventId,
+        eventGuestGroupId
+      )
+    );
+  }, [guestGroup, router, shortName, eventGuestGroupId]);
+
   return guestGroup ? (
     <div className="flex flex-col items-center">
       <div className="shadow-lg">
@@ -66,6 +90,14 @@ export default function ShowGuestGroupQRCode({
       <div className="mt-5 flex flex-col gap-3">
         <Button onClick={handleDownloadQRCode}>Baixar QR Code</Button>
       </div>
+
+      {isLoggedIn && (
+        <div className="mt-5 flex flex-col gap-3">
+          <Button onClick={handleConfirmEventPresence} colorVariant="ghost">
+            Confirmar presenças no Evento
+          </Button>
+        </div>
+      )}
 
       <div className="mt-5 bg-info flex flex-col items-center text-center sm:flex-row rounded-lg py-1 px-3 gap-2 select-none">
         <Image src={ExclamationIcon} alt="Exclamation icon" className="w-4" />

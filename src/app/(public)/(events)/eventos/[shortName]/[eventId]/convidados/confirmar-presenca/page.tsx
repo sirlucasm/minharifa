@@ -96,9 +96,19 @@ export default function ShowEventGuest({
       {isLoading ? (
         <Spinner />
       ) : type === "guest" ? (
-        <ShowGuestQRCode guest={guest} eventGuestId={eventGuestId} />
+        <ShowGuestQRCode
+          guest={guest}
+          eventGuestId={eventGuestId}
+          shortName={shortName}
+        />
       ) : (
-        type === "group" && <ShowGuestGroupQRCode guestGroup={guestGroup} />
+        type === "group" && (
+          <ShowGuestGroupQRCode
+            guestGroup={guestGroup}
+            shortName={shortName}
+            eventGuestGroupId={eventGuestGroupId}
+          />
+        )
       )}
     </Wrapper>
   );

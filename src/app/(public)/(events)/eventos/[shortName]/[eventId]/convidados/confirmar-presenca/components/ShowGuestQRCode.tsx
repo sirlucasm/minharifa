@@ -9,16 +9,24 @@ import ExclamationIcon from "@/assets/icons/exclamation.svg?url";
 import eventService from "@/services/event";
 import { IEventGuest } from "@/@types/event.type";
 import { Checkbox } from "@material-tailwind/react";
+import useAuth from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import routes from "@/routes";
 
 interface ShowGuestQRCodeProps {
   guest: IEventGuest | undefined;
   eventGuestId: string | undefined;
+  shortName: string;
 }
 
 export default function ShowGuestQRCode({
   guest,
   eventGuestId,
+  shortName,
 }: ShowGuestQRCodeProps) {
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
+
   const handleDownloadQRCode = useCallback(async () => {
     if (!guest?.qrCodeImageUrl) return;
     const blob = await (await fetch(guest?.qrCodeImageUrl)).blob();
@@ -52,6 +60,14 @@ export default function ShowGuestQRCode({
     [eventGuestId]
   );
 
+  const handleConfirmEventPresence = useCallback(() => {
+    if (!guest) return;
+    if (!eventGuestId) return;
+    router.push(
+      routes.private.eventGuests.show(shortName, guest.eventId, eventGuestId)
+    );
+  }, [guest, router, shortName, eventGuestId]);
+
   return guest ? (
     <div className="flex flex-col items-center">
       <div className="shadow-lg">
@@ -69,6 +85,14 @@ export default function ShowGuestQRCode({
       <div className="mt-5 flex flex-col gap-3">
         <Button onClick={handleDownloadQRCode}>Baixar QR Code</Button>
       </div>
+
+      {isLoggedIn && (
+        <div className="mt-5 flex flex-col gap-3">
+          <Button onClick={handleConfirmEventPresence} colorVariant="ghost">
+            Confirmar presença no Evento
+          </Button>
+        </div>
+      )}
 
       <div className="mt-5 bg-info flex flex-col items-center text-center sm:flex-row rounded-lg py-1 px-3 gap-2 select-none">
         <Image src={ExclamationIcon} alt="Exclamation icon" className="w-4" />
