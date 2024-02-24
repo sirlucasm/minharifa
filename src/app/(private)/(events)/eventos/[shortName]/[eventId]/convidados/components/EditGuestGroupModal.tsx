@@ -58,6 +58,12 @@ export default function EditGuestGroupModal({
       setIsLoading(true);
       try {
         data.guestIds = guests.map((guest) => guest.id);
+        if (
+          guestGroup.qrCodeColors.dark === data.qrCodeColors.dark &&
+          guestGroup.qrCodeColors.light === data.qrCodeColors.light
+        ) {
+          delete (data as any).qrCodeColors;
+        }
         await eventService.updateEventGuestGroup(
           { eventGuestGroupId: guestGroup.id, eventShortName: shortName },
           {

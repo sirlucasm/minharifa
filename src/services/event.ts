@@ -476,7 +476,7 @@ class EventService {
 
     let qrCodeImageUrl;
 
-    if (eventShortName) {
+    if (eventShortName && !!data.qrCodeColors) {
       const eventGuestGroupQRCodesStorageRef = ref(
         storage,
         `eventGuestGroup/${eventGuestGroupDoc.id}`
@@ -541,6 +541,20 @@ class EventService {
     await updateDoc(eventInvitationsDoc, {
       isCanceled: true,
       canceledAt: new Date(),
+    });
+  };
+
+  addGuestToGroup = async (
+    params: {
+      eventGuestGroupId: string;
+    },
+    data: Partial<CreateEventGuestGroupDto>
+  ) => {
+    const { eventGuestGroupId } = params;
+    const eventGuestGroupDoc = doc(eventGuestGroupsRef, eventGuestGroupId);
+
+    await updateDoc(eventGuestGroupDoc, {
+      guestIds: arrayUnion(...(data.guestIds as string[])),
     });
   };
 }

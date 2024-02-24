@@ -41,6 +41,7 @@ import eventService from "@/services/event";
 import { message } from "antd";
 import EditGuestModal from "./components/EditGuestModal";
 import Input from "@/components/common/Input";
+import AddGuestToGroupModal from "./components/AddGuestToGroupModal";
 
 interface ListEventGuestsProps {
   params: {
@@ -74,6 +75,8 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
     setShowConfirmGuestGroupDeleteDialog,
   ] = useState(false);
   const [showEditGuestGroupModal, setShowEditGuestGroupModal] = useState(false);
+  const [showAddGuestToGroupModal, setShowAddGuestToGroupModal] =
+    useState(false);
   const [showEditGuestModal, setShowEditGuestModal] = useState(false);
 
   const handleOpenEditGuestGroupModal = useCallback(() => {
@@ -81,6 +84,15 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
   }, []);
   const handleCloseEditGuestGroupModal = useCallback(() => {
     setShowEditGuestGroupModal(false);
+
+    setSelectedGuestGroup(undefined);
+  }, []);
+
+  const handleOpenAddGuestToGroupModal = useCallback(() => {
+    setShowAddGuestToGroupModal(true);
+  }, []);
+  const handleCloseAddGuestToGroupModal = useCallback(() => {
+    setShowAddGuestToGroupModal(false);
 
     setSelectedGuestGroup(undefined);
   }, []);
@@ -368,6 +380,15 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
                       Editar
                     </MenuItem>
                     <MenuItem
+                      className="outline-none hover:!outline-none"
+                      onClick={() => {
+                        handleOpenAddGuestToGroupModal();
+                        setSelectedGuestGroup(guestGroup);
+                      }}
+                    >
+                      Adicionar convidado
+                    </MenuItem>
+                    <MenuItem
                       onClick={() => {
                         handleOpenConfirmDeleteDialog("guestGroup");
                         setSelectedGuestGroup(guestGroup);
@@ -475,6 +496,17 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
           </div>
         </div>
       </div>
+
+      {selectedGuestGroup && (
+        <AddGuestToGroupModal
+          open={showAddGuestToGroupModal}
+          handleCancel={handleCloseAddGuestToGroupModal}
+          eventId={eventId}
+          guestGroup={selectedGuestGroup}
+          shortName={shortName}
+          guests={guests}
+        />
+      )}
 
       {selectedGuestGroup && (
         <EditGuestGroupModal
