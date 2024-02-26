@@ -346,7 +346,7 @@ class EventService {
 
     let qrCodeImageUrl;
 
-    if (eventShortName) {
+    if (eventShortName && !!data.qrCodeColors) {
       const eventGuestQRCodesStorageRef = ref(
         storage,
         `eventGuest/${eventGuestDoc.id}`

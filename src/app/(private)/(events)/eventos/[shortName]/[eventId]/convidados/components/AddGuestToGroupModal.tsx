@@ -48,7 +48,7 @@ export default function AddGuestToGroupModal({
       }
 
       setSearchedGuests(
-        guests.filter((guest) => guest.name.includes(searchText))
+        guests.filter((guest) => guest.name.toLowerCase().includes(searchText))
       );
     },
     [guests]

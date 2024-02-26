@@ -49,6 +49,13 @@ export default function EditGuestModal({
     async (data) => {
       if (!guest) return;
 
+      if (
+        guest.qrCodeColors.dark === data.qrCodeColors.dark &&
+        guest.qrCodeColors.light === data.qrCodeColors.light
+      ) {
+        delete (data as any).qrCodeColors;
+      }
+
       setIsLoading(true);
       try {
         await eventService.updateEventGuest(

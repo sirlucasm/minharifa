@@ -174,12 +174,14 @@ export default function ListEventGuests({ params }: ListEventGuestsProps) {
       setSearchedGuestGroups(
         guestGroups.filter(
           (guestGroup) =>
-            guestGroup.name.includes(searchText) ||
-            guestGroup.guests.some((guest) => guest.name.includes(searchText))
+            guestGroup.name.toLowerCase().includes(searchText) ||
+            guestGroup.guests.some((guest) =>
+              guest.name.toLowerCase().includes(searchText)
+            )
         )
       );
       setSearchedGuests(
-        guests.filter((guest) => guest.name.includes(searchText))
+        guests.filter((guest) => guest.name.toLowerCase().includes(searchText))
       );
     },
     [guestGroups, guests]
